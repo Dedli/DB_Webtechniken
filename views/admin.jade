@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  h1 Admininterface
+  h2 Nutzer erstellen
+  p
+    div
+      form(action='create',method='post')
+        div
+          label(for='name')
+            b Name:&nbsp
+              input(id='name',type='text',value='',placeholder='Namen hier eintragen',name='name' required)
+        div
+           label(for='vorname')
+              b Vorname:&nbsp
+                 input(id='vorname',type='text',value='',placeholder='Vornamen hier eintragen',name='vorname' required)
+        div
+           label(for='matrikelnummer')
+              b Matrikelnummer (optional):&nbsp
+                 input(id='matrikelnummer',type='number',value='',placeholder='Matrikelnummer',name='matrikelnummer')
+        div
+           label(for='FSR')
+              b Fachschaftsmitgliedschaft:&nbsp
+                 input(id='fsr')
+              label(for='von')
+                b von:&nbsp;
+                    input(id='matrikelnummer',type='date',value='',placeholder='Von: ',name='von')
+              label(for='bis')
+                b bis:&nbsp;
+                    input(id='matrikelnummer',type='date',value='',placeholder='Bis: ',name='bis')
+
+  h2 Nutzer &auml;ndern
