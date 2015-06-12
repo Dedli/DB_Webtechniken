@@ -7,120 +7,42 @@ var bodyParser = require('body-parser');
 var passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
 var expressSession = require('express-session');
 
+var dbConfig = require('./db');
+var mongoose = require('mongoose');
+// Connect to DB
+mongoose.connect(dbConfig.url);
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-var admin = require('./routes/admin');
-var login = require('./routes/login');
 var app = express();
-
-// Init Passport
-app.use(expressSession({secret: 'mySecretKey'}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser(function(user, done) {
-  done(null, user._id);
-});
-
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
-    done(err, user);
-  });
-});
-
-passport.use('login', new LocalStrategy({
-      passReqToCallback : true
-    },
-    function(req, username, password, done) {
-      // check in mongo if a user with username exists or not
-      User.findOne({ 'username' :  username },
-          function(err, user) {
-            // In case of any error, return using the done method
-            if (err)
-              return done(err);
-            // Username does not exist, log error & redirect back
-            if (!user){
-              console.log('User Not Found with username '+username);
-              return done(null, false,
-                  req.flash('message', 'User Not found.'));
-            }
-            // User exists but wrong password, log the error
-            if (!isValidPassword(user, password)){
-              console.log('Invalid Password');
-              return done(null, false,
-                  req.flash('message', 'Invalid Password'));
-            }
-            // User and password both match, return user from
-            // done method which will be treated like success
-            return done(null, user);
-          }
-      );
-    }));
-
-passport.use('signup', new LocalStrategy({
-      passReqToCallback : true
-    },
-    function(req, username, password, done) {
-      findOrCreateUser = function(){
-        // find a user in Mongo with provided username
-        User.findOne({'username':username},function(err, user) {
-          // In case of any error return
-          if (err){
-            console.log('Error in SignUp: '+err);
-            return done(err);
-          }
-          // already exists
-          if (user) {
-            console.log('User already exists');
-            return done(null, false,
-                req.flash('message','User Already Exists'));
-          } else {
-            // if there is no user with that email
-            // create the user
-            var newUser = new User();
-            // set the user's local credentials
-            newUser.username = username;
-            newUser.password = createHash(password);
-            newUser.email = req.param('email');
-            newUser.firstName = req.param('firstName');
-            newUser.lastName = req.param('lastName');
-
-            // save the user
-            newUser.save(function(err) {
-              if (err){
-                console.log('Error in Saving user: '+err);
-                throw err;
-              }
-              console.log('User Registration succesful');
-              return done(null, newUser);
-            });
-          }
-        });
-      };
-
-      // Delay the execution of findOrCreateUser and execute
-      // the method in the next tick of the event loop
-      process.nextTick(findOrCreateUser);
-    })
-);
+app.use("/public", express.static(path.join(__dirname, 'public')));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
+//app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
-app.use('/admin', admin);
-app.use('/login', login);
+// Configuring Passport
+var passport = require('passport');
+var expressSession = require('express-session');
+app.use(expressSession({resave: true,saveUninitialized: true,secret: 'mySecretKey'}));
+app.use(passport.initialize());
+app.use(passport.session());
 
+// Using the flash middleware provided by connect-flash to store messages in session
+// and displaying in templates
+var flash = require('connect-flash');
+app.use(flash());
+
+// Initialize Passport
+var initPassport = require('./passport/init');
+initPassport(passport);
+
+var routes = require('./routes/index')(passport);
+app.use('/', routes);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
