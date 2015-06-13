@@ -1,0 +1,53 @@
+//
+   Created by daniel on 13.06.2015.
+script(type='text/javascript').
+    var array = 0;
+    function cloneGrm(){
+        array ++;
+        var clonegrm = document.getElementById('Grm').cloneNode(true);
+        clonegrm.getElementsByTagName("button")[0].removeAttribute("style");
+        clonegrm.getElementsByTagName("input")[0].setAttribute("name", "comm["+array+"][committee]");
+        clonegrm.getElementsByTagName("input")[1].setAttribute("name", "comm["+array+"][from]");
+        clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][to]");
+        clonegrm.getElementsByTagName("input")[3].setAttribute("name", "comm["+array+"][reason]");
+        clonegrm.getElementsByTagName("input")[4].setAttribute("name", "comm["+array+"][FS]");
+        document.getElementById('insertGrm').appendChild(clonegrm);
+    }
+    function deleteGrm(child){
+        var node = document.getElementById("insertGrm");
+        node.removeChild(child);
+        array--;
+    }
+div
+    h3 Gremienzugeh&ouml;rigkeit festlegen
+
+div
+    div#Grm
+        label(for='comm[0][committee]')
+            b Gremienmitgliedschaft:&nbsp
+                input.listinput(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
+                datalist#gremien
+                    each gremium, index in gremien
+                        <option value="#{gremium}">
+            label(for='comm[0][from]')
+                b &nbsp;von:&nbsp;
+                    input(type='date',value='',placeholder='Von: ',name='comm[0][from]')
+            label(for='comm[0][to]')
+                b &nbsp;bis:&nbsp;
+                    input(type='date',value='',placeholder='Bis: ',name='comm[0][to]')
+                    button(style='display: none',type='button',id='DelFS',onclick='deleteGrm(this.parentNode.parentNode.parentNode.parentNode)') &#045;
+
+            input(style='width: 100%' type='text',placeholder='Grund Austritt/Eintritt ',name='comm[0][reason]')
+
+            br
+            label(for='FS')
+                b Fachschaftsmitgliedschaft:&nbsp
+                    input.listinput(list='fachschaften' autocomplete='on', type='text', value='', placeholder='Fachschaft ausw\u00e4hlen', name='comm[0][FS]')
+                    datalist#fachschaften
+                        each fachschaft in FS
+                            <option value="#{fachschaft}">
+            br
+    div#insertGrm
+    div#cloneGrm
+        button(type='button',id='CloneGrmbutton',onclick="cloneGrm()",title='hinzufuegen') &#043;
+        br

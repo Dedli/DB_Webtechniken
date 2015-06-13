@@ -1,0 +1,19 @@
+block create_user_form
+            div
+                h3 Nutzerdaten
+            div
+                label(for='name')
+                    b Name:&nbsp
+                        input(id='name',type='text',value='',placeholder='Namen hier eintragen',name='firstname', required)
+            div
+                label(for='vorname')
+                    b Vorname:&nbsp
+                        input(id='vorname',type='text',value='',placeholder='Vornamen hier eintragen',name='lastname', required)
+            div
+                label(for='matrikelnummer')
+                    b Matrikelnummer (optional):&nbsp
+                        input(id='matrikelnummer',type='number',value='',placeholder='Matrikelnummer',name='matr_nr',min=100000,max=999999)
+            div
+                label(for='nkz')
+                    b Nutzerkennzeichen:&nbsp
+                        input(id='nkz',type='text',value='',placeholder='Nutzerkennzeichen',name='nkz', required)

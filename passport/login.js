@@ -38,4 +38,4 @@ module.exports = function(passport){
         return bCrypt.compareSync(password, user.password);
     }
 
-}
+};

@@ -1,72 +1,19 @@
 extends layout
 
 block content
-  script(type='text/javascript').
-    function cloneFS(){ var clonefs = document.getElementById('FS').cloneNode(true); clonefs.getElementsByTagName("button")[0].removeAttribute("style"); document.getElementById('insertFS').appendChild(clonefs);}
-    function deleteFS(child){ var node = document.getElementById("insertFS");node.removeChild(child);}
-    function cloneGrm(){ var clonegrm = document.getElementById('Grm').cloneNode(true); clonegrm.getElementsByTagName("button")[0].removeAttribute("style"); document.getElementById('insertGrm').appendChild(clonegrm);}
-    function deleteGrm(child){ var node = document.getElementById("insertGrm");node.removeChild(child);}
+
   a(href='/signout', class='text-center new-account') Ausloggen
+  p #{message}
   h1 Admininterface
-  h2 Nutzer erstellen
-    div
-      form(action='create',method='post')
-        div
-          label(for='name')
-            b Name:&nbsp
-              input(id='name',type='text',value='',placeholder='Namen hier eintragen',name='name', required)
-        div
-           label(for='vorname')
-              b Vorname:&nbsp
-                 input(id='vorname',type='text',value='',placeholder='Vornamen hier eintragen',name='vorname', required)
-        div
-           label(for='matrikelnummer')
-              b Matrikelnummer (optional):&nbsp
-                 input(id='matrikelnummer',type='number',value='',placeholder='Matrikelnummer',name='matrikelnummer',min=100000,max=999999)
-        div
-                   label(for='nkz')
-                      b Nutzerkennzeichen:&nbsp
-                         input(id='nkz',type='text',value='',placeholder='Nutzerkennzeichen',name='nkz', required)
-        div
-           div#FS
-             label(for='FS')
-                b Fachschaftsmitgliedschaft:&nbsp
-                   input(list='fachschaften' autocomplete='off', type='text', value='', placeholder='Fachschaft ausw\u00e4hlen', name='FS')
-                   datalist#fachschaften
-                     each fachschaft in FS
-                       <option value="#{fachschaft}">
-                label(for='von')
-                  b &nbsp;von:&nbsp;
-                      input(type='date',value='',placeholder='Von: ',name='von')
-                label(for='bis')
-                  b &nbsp;bis:&nbsp;
-                      input(type='date',value='',placeholder='Bis: ',name='bis')
-                      button(style='display: none',type='button',id='DelFS',onclick='deleteFS(this.parentNode.parentNode.parentNode.parentNode)') &#045;
-                br
-           div#insertFS
-           div#cloneFS
-            button(type='button',id='CloneFSbutton',onclick="cloneFS()",title='add') &#043;
-        div
-                   div#Grm
-                     label(for='Gremium')
-                        b Gremienmitgliedschaft:&nbsp
-                           input(list='gremien' autocomplete='off', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='Gremium')
-                           datalist#gremien
-                             each gremium in gremien
-                               <option value="#{gremium}">
-                        label(for='von')
-                          b &nbsp;von:&nbsp;
-                              input(type='date',value='',placeholder='Von: ',name='von')
-                        label(for='bis')
-                          b &nbsp;bis:&nbsp;
-                              input(type='date',value='',placeholder='Bis: ',name='bis')
-                              button(style='display: none',type='button',id='DelFS',onclick='deleteGrm(this.parentNode.parentNode.parentNode.parentNode)') &#045;
-                        br
-                   div#insertGrm
-                   div#cloneGrm
-                    button(type='button',id='CloneGrmbutton',onclick="cloneGrm()",title='hinzufuegen') &#043;
-        div
-          button(type='submit',id='submitCreateUser') Nutzer anlegen
+    hr
+  div
+        h2 Nutzer Anlegen
+        form(action='/create_grem_user',method='post')
+            include create_user_form
+            hr
+            include create_grem_form
+            div
+               button(type='submit',id='submitCreateUser') Nutzer anlegen
 
 
   h2 Nutzer &auml;ndern
