@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var grm_user = require('../models/grem_member');
-var membership_model = require('../models/membership')
+var membership_model = require('../models/membership');
+var moment = require('moment');
 var isAuthenticated = function (req, res, next) {
   // if user is authenticated in the session, call the next() to call the next request handler
   // Passport adds this method to request object. A middleware is allowed to add properties to
@@ -50,6 +51,7 @@ module.exports = function(passport){
       });
       console.log('\nsave user: ');console.log(user);
       for (var grem in req.body.comm){
+          console.log("ID beim Post: "+user._id);
       var membership = new membership_model({
           grem_id: req.body.comm[grem].committee,
           from : req.body.comm[grem].from,
@@ -59,6 +61,7 @@ module.exports = function(passport){
           council_id : req.body.comm[grem].FS,
           successor: false
       });
+
       console.log('\nsave membership: ');console.log(membership);}
       user.save(function (err,user){
           if(err) {
@@ -68,21 +71,48 @@ module.exports = function(passport){
                     if(err) {
                         res.json(400).json(err);
                         return next(err)}});
-              res.status(201).render('admin', {
-                  message: "erfolgreich",
-                  user: req.user,  title: 'testuser',
-                  FS: ['Chemie','Informatik','Mathematik','Elektrotechnik/Informationstechnik','Philosophische Fakult\u00e4t','Wirtschaftswissenschaften','Human- und Sozialwissenschaften','Physik'],
-                  gremien: ['StuRa','FSR']
-              });
+              res.render('success', {msg: 'Nuter erfolgreich angelegt'});
+
       })
   });
 
+    /*Get Member Edit*/
+    router.get('/edit_grm_user', function(req, res){
+        var user_id = req.query.id;
+        var member;
+        grm_user.findById(user_id, function(err,user){
+           if(!user) res.status(404).send("Nutzer nicht gefunden");
+           else if(err) res.status(500).send(err.message);
+           else{
+              member = user;
+           }
+        });
+        membership_model.find({user_id: user_id}, function(err,memberships) {
+            if(!memberships) res.status(404).send("Keine Gremnienmitgliedschaft");
+            else if(err) res.status(500).send(err.message);
+            else {
+                JSON.stringify(memberships);
+                JSON.stringify(member);
+                res.render('edit_grm_user', {moment: moment, user: member, memberships: memberships,FS: ['Chemie','Informatik','Mathematik','Elektrotechnik/Informationstechnik','Philosophische Fakult\u00e4t','Wirtschaftswissenschaften','Human- und Sozialwissenschaften','Physik'],
+                    gremien: ['StuRa','FSR']});
+            }
+        });
+    });
+
   /* GET Home Page */
   router.get('/admin', isAuthenticated, function(req, res){
-    res.render('admin', { user: req.user,  title: 'testuser',
-        FS: ['Chemie','Informatik','Mathematik','Elektrotechnik/Informationstechnik','Philosophische Fakult\u00e4t','Wirtschaftswissenschaften','Human- und Sozialwissenschaften','Physik'],
-        gremien: ['StuRa','FSR']
-    });
+      var grm_users;
+      grm_user.find().lean().exec(function(err,grm_users){
+          if(!grm_users) res.send('Fehler bei der Datenbankabfrage');
+          else{
+              console.log("DATA:");console.log(grm_users);
+              JSON.stringify(grm_users);
+              res.render('admin', {grm_members: grm_users, user: req.user,  title: 'testuser',
+                  FS: ['Chemie','Informatik','Mathematik','Elektrotechnik/Informationstechnik','Philosophische Fakult\u00e4t','Wirtschaftswissenschaften','Human- und Sozialwissenschaften','Physik'],
+                  gremien: ['StuRa','FSR']
+              });
+          }
+      });
   });
 
   /* Handle Logout */

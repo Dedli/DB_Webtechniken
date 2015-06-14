@@ -10,10 +10,28 @@ block content
         h2 Nutzer Anlegen
         form(action='/create_grem_user',method='post')
             include create_user_form
-            hr
             include create_grem_form
             div
                button(type='submit',id='submitCreateUser') Nutzer anlegen
-
-
+  hr
   h2 Nutzer &auml;ndern
+  table(border= '1px')
+    thead
+        tr
+            td.hidden ID
+            td Vorname
+            td Nachname
+            td Nuterkennzeichen
+            td Matrikelnummer
+            td bearbeiten
+    tbody
+    each object in grm_members
+        tr
+            td.hidden=object._id
+            td=object.firstname
+            td=object.lastname
+            td=object.nkz
+            td=object.matr_nr
+            td
+                    a(href='/edit_grm_user?id='+object._id)
+                        span.glyphicon.glyphicon-edit

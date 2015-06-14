@@ -89,3 +89,6 @@ ul.user-details{
 .listinput{
     width: 200px;
 }
+.hidden{
+    display: none;
+}
