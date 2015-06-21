@@ -35,8 +35,8 @@ block content
             b Gremienmitgliedschaft:&nbsp
                 input.listinput(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
                 datalist#gremien
-                    each gremium, index in gremien
-                        <option value="#{gremium}">
+                    each gremium, index in committees
+                        <option value="#{gremium._name}">
         label(for='comm[0][from]')
             b &nbsp;von:&nbsp;
                 input(type='date',value='',placeholder='Von: ',name='comm[0][from]')
@@ -58,11 +58,11 @@ block content
                         <option value="#{fachschaft}">
         br
 
-    form(action='/edit_grm_user',method='post')
+    form(action='/edit_grm_user/'+user._id,method='post')
         div
             h3 Nutzerdaten
         div
-            input(name='id',type='hidden',value=user._id)
+            input(name='_id',type='hidden',value=user._id)
         div
             label(for='name')
                 b Name:&nbsp
@@ -86,8 +86,8 @@ block content
                     b Gremienmitgliedschaft:&nbsp
                         input.listinput(list='gremien' autocomplete='off', type='text', value=membership.grem_id, placeholder='Gremium ausw\u00e4hlen', name='comm['+index+'][committee]')
                         datalist#gremien
-                            each gremium, index in gremien
-                                <option value="#{gremium}">
+                            each gremium, index in committees
+                                <option value="#{gremium._name}>
                 label(for='comm['+index+'][from]')
                     b &nbsp;von:&nbsp;
                         input(type='date',value=moment(membership.from).format("YYYY-MM-DD"),placeholder='Von: ',name='comm['+index+'][from]')
@@ -108,6 +108,7 @@ block content
                         datalist#fachschaften
                             each fachschaft in FS
                                 <option value="#{fachschaft}">
+                     input(type='hidden',name='comm['+index+'][membership_id]',value=membership._id)
                 br
 
         div#insertGrm

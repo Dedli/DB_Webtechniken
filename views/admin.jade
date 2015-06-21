@@ -33,5 +33,28 @@ block content
             td=object.nkz
             td=object.matr_nr
             td
-                    a(href='/edit_grm_user?id='+object._id)
+                    a(href='/edit_grm_user/'+object._id)
+                        span.glyphicon.glyphicon-edit
+  hr
+  h2 Gremien
+  a(href='/create_committee') Gremium erstellen
+  table(border= '1px')
+      thead
+          tr
+            td.hidden ID
+            td Namen
+            td Beschreibung
+            td bearbeiten
+      tdbody
+      each comm in committees
+          tr
+            form(action='/edit_committee/'+comm._id, method='post', name='edit_committee')
+                td.hidden
+                    input(value=comm._id,name='id')
+                td
+                    input(type='text',value=comm._name,name='_name')
+                td
+                    input(type='text', value=comm.description,name='description')
+                td
+                    a(href='#',onclick="edit_committee.submit()")
                         span.glyphicon.glyphicon-edit

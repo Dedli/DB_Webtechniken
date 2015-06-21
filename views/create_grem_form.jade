@@ -27,7 +27,7 @@ div
             b Gremienmitgliedschaft:&nbsp
                 input.listinput(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
                 datalist#gremien
-                    each gremium, index in gremien
+                    each gremium, index in committees
                         <option value="#{gremium}">
             label(for='comm[0][from]')
                 b &nbsp;von:&nbsp;

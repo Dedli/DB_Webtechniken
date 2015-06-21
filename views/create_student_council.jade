@@ -1,0 +1,13 @@
+//
+   Created by daniel on 21.06.2015.
+
+block create_student_council
+    form(action='/create_student_council',method='post')
+        div
+            h3 Fachschaft erstellen
+        div
+            label(for='name')
+                b Name:&nbsp
+                    input(id='name',type='text',value='',placeholder='Namen hier eintragen',name='name', required)
+        div
+            button(type='submit',id='submitCreateStudentCouncil') Fachschaft anlegen

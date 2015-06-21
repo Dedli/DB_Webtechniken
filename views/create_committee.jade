@@ -1,0 +1,17 @@
+//
+   Created by daniel on 21.06.2015.
+
+block create_committee
+    form(action='/create_committee',method='post')
+        div
+            h3 Gremium erstellen
+        div
+            label(for='name')
+                b Name:&nbsp
+                    input(id='name',type='text',value='',placeholder='Namen hier eintragen',name='_name', required)
+        div
+            label(for='description')
+                b Beschreibung:&nbsp
+                    input(id='description',type='text',value='',placeholder='Beschreibung hier eintragen',name='description', required)
+        div
+            button(type='submit',id='submitCreateCommittee') Gremium anlegen

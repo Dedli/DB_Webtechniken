@@ -5,5 +5,5 @@ var mongoose = require('mongoose');
 
 module.exports = mongoose.model('Student_council',{
     id: String,
-    name: String
+    _name: String
 });

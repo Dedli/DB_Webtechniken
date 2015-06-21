@@ -5,6 +5,6 @@ var mongoose = require('mongoose');
 
 module.exports = mongoose.model('Committee',{
     id: String,
-    name: String,
+    _name: String,
     description: String
 });
