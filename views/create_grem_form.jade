@@ -6,11 +6,11 @@ script(type='text/javascript').
         array ++;
         var clonegrm = document.getElementById('Grm').cloneNode(true);
         clonegrm.getElementsByTagName("button")[0].removeAttribute("style");
-        clonegrm.getElementsByTagName("input")[0].setAttribute("name", "comm["+array+"][committee]");
-        clonegrm.getElementsByTagName("input")[1].setAttribute("name", "comm["+array+"][from]");
-        clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][to]");
-        clonegrm.getElementsByTagName("input")[3].setAttribute("name", "comm["+array+"][reason]");
-        clonegrm.getElementsByTagName("input")[4].setAttribute("name", "comm["+array+"][FS]");
+        clonegrm.getElementsByTagName("select")[0].setAttribute("name", "comm["+array+"][committee]");
+        clonegrm.getElementsByTagName("select")[1].setAttribute("name", "comm["+array+"][council_id]");
+        clonegrm.getElementsByTagName("input")[0].setAttribute("name", "comm["+array+"][from]");
+        clonegrm.getElementsByTagName("input")[1].setAttribute("name", "comm["+array+"][to]");
+        clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][reason]");
         document.getElementById('insertGrm').appendChild(clonegrm);
     }
     function deleteGrm(child){
@@ -25,10 +25,10 @@ div
     div#Grm
         label(for='comm[0][committee]')
             b Gremienmitgliedschaft:&nbsp
-                input.listinput(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
-                datalist#gremien
+                select(value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
+                    <option value="" style="display:none;"></option>
                     each gremium, index in committees
-                        <option value="#{gremium}">
+                        <option value="#{gremium._id}">#{gremium._name}</option>
             label(for='comm[0][from]')
                 b &nbsp;von:&nbsp;
                     input(type='date',value='',placeholder='Von: ',name='comm[0][from]')
@@ -42,10 +42,10 @@ div
             br
             label(for='FS')
                 b Fachschaftsmitgliedschaft:&nbsp
-                    input.listinput(list='fachschaften' autocomplete='on', type='text', value='', placeholder='Fachschaft ausw\u00e4hlen', name='comm[0][FS]')
-                    datalist#fachschaften
-                        each fachschaft in FS
-                            <option value="#{fachschaft}">
+                    select(value='', placeholder='Fachschaft ausw\u00e4hlen', name='comm[0][council_id]')
+                        <option value="" style="display:none;"></option>
+                        each fachschaft in student_council
+                            <option value="#{fachschaft._id}">#{fachschaft._name}</option>
             br
     div#insertGrm
     div#cloneGrm

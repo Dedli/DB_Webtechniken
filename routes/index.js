@@ -4,6 +4,7 @@ var grm_user_model = require('../models/grem_member');
 var membership_model = require('../models/membership');
 var committee_model = require('../models/committee');
 var student_council_model = require('../models/student_council');
+var period_model = require('../models/period');
 var moment = require('moment');
 var isAuthenticated = function (req, res, next) {
   // if user is authenticated in the session, call the next() to call the next request handler
@@ -44,7 +45,7 @@ module.exports = function(passport){
 
   /* Handle grem_user Create Post */
   router.post('/create_grem_user', function(req, res, next){
-      console.log('got from form: ');console.log(req.body);
+      //console.log('got from form: ');console.log(req.body);
       var user = new grm_user_model({
           firstname: req.body.firstname,
           lastname: req.body.lastname,
@@ -53,16 +54,25 @@ module.exports = function(passport){
       });
       console.log('\nsave user: ');console.log(user);
       for (var grem in req.body.comm){
-          console.log("ID beim Post: "+user._id);
+          //console.log("ID beim Post: "+user._id);
       var membership = new membership_model({
           grem_id: req.body.comm[grem].committee,
           from : req.body.comm[grem].from,
           to : req.body.comm[grem].to,
           reason : req.body.comm[grem].reason,
           user_id : user._id,
-          council_id : req.body.comm[grem].FS,
+          council_id : req.body.comm[grem].council_id,
           successor: false
       });
+          membership.save(function (err,user) {
+              if (err) {
+                  res.status(err.status || 500);
+                  res.render('error', {
+                      message: err.message,
+                      error: err
+                  })
+              }
+          });
 
       console.log('\nsave membership: ');console.log(membership);}
       user.save(function (err,user){
@@ -71,19 +81,15 @@ module.exports = function(passport){
               res.render('error', {
                   message: err.message,
                   error: err
-              });}
-                membership.save(function (err,user) {
-                    if (err) {
-                        res.status(err.status || 500);
-                        res.render('error', {
-                            message: err.message,
-                            error: err
-                        })
-                    }
-                });
-                    res.render('success', {msg: 'Nuter erfolgreich angelegt'});
+              });
+          }
+          else res.render('success', {msg: 'Nuter erfolgreich angelegt'});
+
+
 
       })
+
+
   });
 
     /*Get Member Edit*/
@@ -115,12 +121,26 @@ module.exports = function(passport){
                     else if (!committees) res.status(404).send('Fehler beim DB Zugriff');
                     else {
                         JSON.stringify(committees);
+
+                        student_council_model.find().lean().exec(function (err, student_council) {
+                            if (err) {
+                                res.status(err.status || 500);
+                                res.render('error', {
+                                    message: err.message,
+                                    error: err
+                                });
+                            }
+                            else if (!student_council) res.status(404).send('Fehler beim DB Zugriff');
+                            else {
+
                         res.render('edit_grm_user', {
                             moment: moment,
                             user: member,
                             memberships: memberships,
-                            FS: ['Chemie', 'Informatik', 'Mathematik', 'Elektrotechnik/Informationstechnik', 'Philosophische Fakult\u00e4t', 'Wirtschaftswissenschaften', 'Human- und Sozialwissenschaften', 'Physik'],
+                            student_council: student_council,
                             committees: committees
+                        });
+                            }
                         });
                     }
                     });
@@ -139,7 +159,7 @@ module.exports = function(passport){
             _name: comm._name,
             description: comm.description
         });
-        committee.save(function (err,user){
+        committee.save(function (err){
             if(err) {
                 res.status(err.status || 500);
                 res.render('error', {
@@ -175,11 +195,120 @@ module.exports = function(passport){
                             error: err
                         });
                     }
-                    res.render('success', {msg: 'Gremium erfolgreich angelegt'});
+                    res.render('success', {msg: 'Gremium erfolgreich editiert'});
                 })
             }
         });
     });
+
+    router.get('/create_student_council', function(req, res){
+        res.render('create_student_council');
+    });
+
+    router.post('/create_student_council', function(req, res){
+        var council = req.body;
+        console.log("Create Student Council: "+JSON.stringify(council));
+        var cou = new student_council_model({
+            _name: council._name
+        });
+        cou.save(function (err){
+            if(err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
+            res.render('success', {msg: 'Fachschaft erfolgreich angelegt'});
+        })
+    });
+
+
+    router.post('/edit_student_council/:_id', function(req, res) {
+        var council = req.body;
+        var council_id = req.params._id;
+        console.log("From Edit Council: "+council_id);
+        student_council_model.findById(council_id, function (err, cou) {
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
+            else if (!cou) res.status(404).send("Fachschaft nicht gefunden");
+            else {
+
+                cou._name = council._name || cou._name;
+                cou.save(function (err, council) {
+                    if (err) {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            error: err
+                        });
+                    }
+                    res.render('success', {msg: 'Fachschaft erfolgreich editiert'});
+                })
+            }
+        });
+    });
+
+    router.get('/create_period', function(req, res){
+        res.render('create_period');
+    });
+
+    router.post('/create_period', function(req, res){
+        var period = req.body;
+        console.log("Create period: "+JSON.stringify(period));
+        var per = new period_model({
+            from: period.from,
+            to: period.to
+        });
+        per.save(function (err){
+            if(err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
+            res.render('success', {msg: 'Amtsperiode erfolgreich angelegt'});
+        })
+    });
+
+    router.post('/edit_period/:_id', function(req, res) {
+        var period = req.body;
+        var period_id = req.params._id;
+        console.log("From Edit Period: "+period_id);
+        period_model.findById(period_id, function (err, per) {
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
+            else if (!per) res.status(404).send("Amtszeit nicht gefunden");
+            else {
+
+                per.from = period.from || per.from;
+                per.to = period.to || per.to;
+                per.save(function (err, per_new) {
+                    if (err) {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            error: err
+                        });
+                    }
+                    res.render('success', {msg: 'Amtsperiode erfolgreich editiert'});
+                })
+            }
+        });
+    });
+
+
     router.post('/edit_grm_user/:_id',function(req,res,next) {
         console.log('got from form edit_user: ');
         console.log(req.body);
@@ -287,21 +416,49 @@ module.exports = function(passport){
                           }
                           else if (!committees) res.status(404).send('Fehler beim DB Zugriff');
                           else {
-                              JSON.stringify(committees);
-                              console.log("Committees: "+committees);
+
+                              student_council_model.find().lean().exec(function (err, student_council) {
+                                  if (err) {
+                                      res.status(err.status || 500);
+                                      res.render('error', {
+                                          message: err.message,
+                                          error: err
+                                      });
+                                  }
+                                  else if (!student_council) res.status(404).send('Fehler beim DB Zugriff');
+                                  else {
+
+                                      period_model.find().lean().exec(function (err, periods) {
+                                          if (err) {
+                                              res.status(err.status || 500);
+                                              res.render('error', {
+                                                  message: err.message,
+                                                  error: err
+                                              });
+                                          }
+                                          else if (!periods) res.status(404).send('Fehler beim DB Zugriff');
+                                          else {
+
+
                       res.render('admin', {
-                          grm_members: grm_user_models, user: req.user, title: 'testuser', committees: committees,
-                          FS: ['Chemie', 'Informatik', 'Mathematik', 'Elektrotechnik/Informationstechnik', 'Philosophische Fakult\u00e4t', 'Wirtschaftswissenschaften', 'Human- und Sozialwissenschaften', 'Physik'],
-
-
+                          grm_members: grm_user_models,
+                          user: req.user,
+                          title: 'testuser',
+                          committees: committees,
+                          student_council: student_council,
+                          periods: periods,
+                          moment: moment
                       });
-                  }
+                  } });
+                                  }
+                              });
+                          }
               });
           }
       });
           }
       });
-  });
+          });
 
   /* Handle Logout */
   router.get('/signout', function(req, res) {

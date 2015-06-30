@@ -46,9 +46,9 @@ block content
             td Beschreibung
             td bearbeiten
       tdbody
-      each comm in committees
+      each comm,index in committees
           tr
-            form(action='/edit_committee/'+comm._id, method='post', name='edit_committee')
+            form(action='/edit_committee/'+comm._id, method='post', name='edit_committee'+index)
                 td.hidden
                     input(value=comm._id,name='id')
                 td
@@ -56,5 +56,48 @@ block content
                 td
                     input(type='text', value=comm.description,name='description')
                 td
-                    a(href='#',onclick="edit_committee.submit()")
+                    a(href='#',onclick="edit_committee"+index+".submit()")
                         span.glyphicon.glyphicon-edit
+  hr
+  h2 Fachschaften
+  a(href='/create_student_council') Fachschaft erstellen
+  table(border= '1px')
+        thead
+            tr
+                td.hidden ID
+                td Namen
+                td bearbeiten
+        tdbody
+        each council,index in student_council
+            tr
+                form(action='/edit_student_council/'+council._id, method='post', name='edit_student_council'+index)
+                    td.hidden
+                        input(value=council._id,name='id')
+                    td
+                        input(type='text',value=council._name,name='_name')
+                    td
+                        a(href='#',onclick="edit_student_council"+index+".submit()")
+                            span.glyphicon.glyphicon-edit
+  hr
+  h2 Amtsperioden
+  a(href='/create_period') Amtsperiode erstellen
+  table(border= '1px')
+        thead
+            tr
+                td.hidden ID
+                td von
+                td bis
+                td bearbeiten
+        tdbody
+        each period,index in periods
+            tr
+                form(action='/edit_period/'+period._id, method='post', name='edit_period'+index)
+                    td.hidden
+                        input(value=period._id,name='id')
+                    td
+                        input(type='date',value=moment(period.from).format("YYYY-MM-DD"),name='from')
+                    td
+                        input(type='date',value=moment(period.to).format("YYYY-MM-DD"),name='to')
+                    td
+                        a(href='#',onclick="edit_period"+index+".submit()")
+                            span.glyphicon.glyphicon-edit

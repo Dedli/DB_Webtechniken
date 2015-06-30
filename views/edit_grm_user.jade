@@ -12,11 +12,12 @@ script(type='text/javascript').
         var clonegrm = document.getElementById('Grm').cloneNode(true);
         clonegrm.classList.remove("hidden");
         clonegrm.getElementsByTagName("button")[0].removeAttribute("style");
-        clonegrm.getElementsByTagName("input")[0].setAttribute("name", "comm["+array+"][committee]");
-        clonegrm.getElementsByTagName("input")[1].setAttribute("name", "comm["+array+"][from]");
-        clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][to]");
-        clonegrm.getElementsByTagName("input")[3].setAttribute("name", "comm["+array+"][reason]");
-        clonegrm.getElementsByTagName("input")[4].setAttribute("name", "comm["+array+"][FS]");
+        clonegrm.getElementsByTagName("select")[0].setAttribute("name", "comm["+array+"][committee]");
+        clonegrm.getElementsByTagName("select")[1].setAttribute("name", "comm["+array+"][council_id]");
+        clonegrm.getElementsByTagName("input")[0].setAttribute("name", "comm["+array+"][from]");
+        clonegrm.getElementsByTagName("input")[1].setAttribute("name", "comm["+array+"][to]");
+        clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][reason]");
+
         document.getElementById('insertGrm').appendChild(clonegrm);
     }
     function deleteGrm(child){
@@ -33,10 +34,9 @@ block content
     div#Grm.hidden
         label(for='comm[0][committee]')
             b Gremienmitgliedschaft:&nbsp
-                input.listinput(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
-                datalist#gremien
+                select(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][grem_id]')
                     each gremium, index in committees
-                        <option value="#{gremium._name}">
+                        <option value="#{gremium._id}">#{gremium._name}</option>
         label(for='comm[0][from]')
             b &nbsp;von:&nbsp;
                 input(type='date',value='',placeholder='Von: ',name='comm[0][from]')
@@ -50,12 +50,11 @@ block content
                     input(type='text',placeholder='Grund Austritt/Eintritt ',name='comm[0][reason]')
 
         br
-        label(for='FS')
+        label(for='comm[0][council_id]')
             b Fachschaftsmitgliedschaft:&nbsp
-                input.listinput(list='fachschaften' autocomplete='on', type='text', value='', placeholder='Fachschaft ausw\u00e4hlen', name='comm[0][FS]')
-                datalist#fachschaften
-                    each fachschaft in FS
-                        <option value="#{fachschaft}">
+                select(autocomplete='off', value='', placeholder='Fachschaft ausw\u00e4hlen', name='comm[0][council_id]')
+                    each fachschaft in student_council
+                        <option value="#{fachschaft._id}">#{fachschaft._name}</option>
         br
 
     form(action='/edit_grm_user/'+user._id,method='post')
@@ -84,10 +83,9 @@ block content
             div
                 label(for='comm['+index+'][committee]')
                     b Gremienmitgliedschaft:&nbsp
-                        input.listinput(list='gremien' autocomplete='off', type='text', value=membership.grem_id, placeholder='Gremium ausw\u00e4hlen', name='comm['+index+'][committee]')
-                        datalist#gremien
+                        select(value=membership.grem_id, name='comm['+index+'][committee]')
                             each gremium, index in committees
-                                <option value="#{gremium._name}>
+                                <option value="#{gremium._id}>#{gremium._name}</option>
                 label(for='comm['+index+'][from]')
                     b &nbsp;von:&nbsp;
                         input(type='date',value=moment(membership.from).format("YYYY-MM-DD"),placeholder='Von: ',name='comm['+index+'][from]')
@@ -104,10 +102,9 @@ block content
                 br
                 label(for='FS')
                     b Fachschaftsmitgliedschaft:&nbsp
-                        input.listinput(list='fachschaften', onload='raiseArray()',autocomplete='off', type='text', value=membership.council_id, placeholder='Fachschaft ausw\u00e4hlen', name='comm['+index+'][FS]')
-                        datalist#fachschaften
-                            each fachschaft in FS
-                                <option value="#{fachschaft}">
+                        select(onload='raiseArray()',autocomplete='off', value=membership.council_id, name='comm['+index+'][council_id]')
+                            each fachschaft in student_council
+                                <option value="#{fachschaft._id}">#{fachschaft._name}</option>
                      input(type='hidden',name='comm['+index+'][membership_id]',value=membership._id)
                 br
 
