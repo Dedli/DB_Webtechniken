@@ -5,6 +5,7 @@ var membership_model = require('../models/membership');
 var committee_model = require('../models/committee');
 var student_council_model = require('../models/student_council');
 var period_model = require('../models/period');
+
 var moment = require('moment');
 var isAuthenticated = function (req, res, next) {
   // if user is authenticated in the session, call the next() to call the next request handler
@@ -55,14 +56,16 @@ module.exports = function(passport){
       console.log('\nsave user: ');console.log(user);
       for (var grem in req.body.comm){
           //console.log("ID beim Post: "+user._id);
-      var membership = new membership_model({
+
+          var membership = new membership_model({
           grem_id: req.body.comm[grem].committee,
           from : req.body.comm[grem].from,
           to : req.body.comm[grem].to,
           reason : req.body.comm[grem].reason,
           user_id : user._id,
           council_id : req.body.comm[grem].council_id,
-          successor: false
+          successor: req.body.comm[grem].successor || false
+
       });
           membership.save(function (err,user) {
               if (err) {
@@ -73,6 +76,7 @@ module.exports = function(passport){
                   })
               }
           });
+
 
       console.log('\nsave membership: ');console.log(membership);}
       user.save(function (err,user){
@@ -89,9 +93,7 @@ module.exports = function(passport){
 
       })
 
-
   });
-
     /*Get Member Edit*/
     router.get('/edit_grm_user/:user_id', function(req, res){
         var user_id = req.params.user_id;
@@ -101,6 +103,7 @@ module.exports = function(passport){
            if(!user) res.status(404).send("Nutzer nicht gefunden");
            else if(err) res.status(500).send(err.message);
            else{
+
               member = user;
            }
         });
@@ -109,6 +112,7 @@ module.exports = function(passport){
             else if(err) res.status(500).send(err.message);
             else {
                 JSON.stringify(memberships);
+                console.log("Membership from DB "+JSON.stringify(memberships));
                 JSON.stringify(member);
                 committee_model.find().lean().exec(function (err, committees) {
                     if (err) {
@@ -118,7 +122,7 @@ module.exports = function(passport){
                             error: err
                         });
                     }
-                    else if (!committees) res.status(404).send('Fehler beim DB Zugriff');
+                    else if (!committees) res.status(404).send('Committee not found');
                     else {
                         JSON.stringify(committees);
 
@@ -130,7 +134,7 @@ module.exports = function(passport){
                                     error: err
                                 });
                             }
-                            else if (!student_council) res.status(404).send('Fehler beim DB Zugriff');
+                            else if (!student_council) res.status(404).send('Student council not found');
                             else {
 
                         res.render('edit_grm_user', {
@@ -356,20 +360,44 @@ module.exports = function(passport){
                             res.send('Committee not found');
                         }
                         else {
-                            comm.grem_id = user.comm[membership].committee || comm.grem_id;
-                            comm.from = user.comm[membership].from || comm.from;
-                            comm.to = user.comm[membership].to || comm.to;
-                            comm.reason = user.comm[membership].reason;
-                            comm.successor = user.comm[membership].successor;
-                            console.log('Save Committee: '+ comm);
-                            comm.save(function (err) {
-                                if (err) {
-                                    res.status(500);
-                                    res.render('error', {
-                                        message: err.message,
-                                        error: err
-                                    });
-                                }
+
+                                period_model.find().lean().exec(function (err, periods)  {
+
+                                    if (err) {
+                                        res.status(err.status || 500);
+                                        res.render('error', {
+                                            message: err.message,
+                                            error: err
+                                        });
+                                    }
+                                    else if (!periods) {
+                                        res.status(404);
+                                        res.send('Committee not found');
+                                    }
+                                    else {
+                                        var succ = user.comm[membership].successor;
+                                        if(!succ) succ = false;
+                                            comm.grem_id = user.comm[membership].grem_id || comm.grem_id;
+                                            comm.from = user.comm[membership].from || comm.from;
+                                            comm.to = user.comm[membership].to || comm.to;
+                                            comm.reason = user.comm[membership].reason;
+                                            comm.successor = succ;
+
+                                            console.log('Save Membership: ' + comm);
+                                            comm.save(function (err) {
+                                                if (err) {
+                                                    res.status(500);
+                                                    res.render('error', {
+                                                        message: err.message,
+                                                        error: err
+                                                    });
+                                                }
+
+                                            });
+
+                                    }
+
+
                                 res.render('success', {msg: 'Nuter erfolgreich geaendert'});
                             });
 

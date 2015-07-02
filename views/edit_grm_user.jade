@@ -84,8 +84,8 @@ block content
                 label(for='comm['+index+'][committee]')
                     b Gremienmitgliedschaft:&nbsp
                         select(value=membership.grem_id, name='comm['+index+'][committee]')
-                            each gremium, index in committees
-                                <option value="#{gremium._id}>#{gremium._name}</option>
+                            each gremium, i in committees
+                                <option value="#{gremium._id}">#{gremium._name}</option>
                 label(for='comm['+index+'][from]')
                     b &nbsp;von:&nbsp;
                         input(type='date',value=moment(membership.from).format("YYYY-MM-DD"),placeholder='Von: ',name='comm['+index+'][from]')
@@ -107,7 +107,12 @@ block content
                                 <option value="#{fachschaft._id}">#{fachschaft._name}</option>
                      input(type='hidden',name='comm['+index+'][membership_id]',value=membership._id)
                 br
-
+                label(for='successor')
+                    b Nachr&uuml;cker:&nbsp;
+                        if membership.successor
+                            input( type="checkbox" name='comm['+index+'][successor]' value="true" checked)
+                        else
+                            input( type="checkbox" name='comm['+index+'][successor]' value="true")
         div#insertGrm
         div#cloneGrm
         button(type='button',id='CloneGrmbutton',onclick="cloneGrm()",title='hinzufuegen') &#043;

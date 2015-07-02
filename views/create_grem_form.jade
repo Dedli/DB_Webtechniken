@@ -47,6 +47,9 @@ div
                         each fachschaft in student_council
                             <option value="#{fachschaft._id}">#{fachschaft._name}</option>
             br
+            label(for='successor')
+                b Nachr&uuml;cker:&nbsp;
+                    input( type="checkbox" name="comm[0][successor]" value="true")
     div#insertGrm
     div#cloneGrm
         button(type='button',id='CloneGrmbutton',onclick="cloneGrm()",title='hinzufuegen') &#043;
