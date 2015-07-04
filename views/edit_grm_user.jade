@@ -21,6 +21,9 @@ script(type='text/javascript').
         clonegrm.getElementsByTagName("input")[0].setAttribute("name", "comm["+array+"][from]");
         clonegrm.getElementsByTagName("input")[1].setAttribute("name", "comm["+array+"][to]");
         clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][reason]");
+        clonegrm.getElementsByTagName("input")[3].setAttribute("name", "comm["+array+"][membership_id]");
+        clonegrm.getElementsByTagName("input")[4].setAttribute("name", "comm["+array+"][successor]");
+
 
         document.getElementById('insertGrm').appendChild(clonegrm);
     }
@@ -56,7 +59,7 @@ block content
     div#Grm.hidden
         label(for='comm[0][committee]')
             b Gremienmitgliedschaft:&nbsp
-                select(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][grem_id]')
+                select(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
                     each gremium, index in committees
                         <option value="#{gremium._id}">#{gremium._name}</option>
         label(for='comm[0][from]')
@@ -67,7 +70,7 @@ block content
                 input(type='date',value='',placeholder='Bis: ',name='comm[0][to]')
                 button(style='display: none',type='button',id='DelFS',onclick='deleteGrm(this.parentNode.parentNode.parentNode)') &#045;
         div
-            label(for='comm['+index+'][reason]')
+            label(for='comm[0][reason]')
                 b Grund f&uuml;r Austritt/Eintritt ausserhalb der Amtsperiode&nbsp;
                     input(type='text',placeholder='Grund Austritt/Eintritt ',name='comm[0][reason]')
         br
@@ -77,6 +80,10 @@ block content
                     each fachschaft in student_council
                         <option value="#{fachschaft._id}">#{fachschaft._name}</option>
         br
+        input(type='hidden',name='comm['+index+'][membership_id]',value='')
+        label(for='successor')
+            b Nachr&uuml;cker:&nbsp;
+                    input( type="checkbox" name='comm[0][successor]' value="true" )
     div#cou.hidden
         label(for='council[0][council_id]')
             b Fachschaftsmitgliedschaft:&nbsp

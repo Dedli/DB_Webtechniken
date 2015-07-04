@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var validator = require('validator');
 var grm_user_model = require('../models/grem_member');
 var membership_model = require('../models/membership');
 var committee_model = require('../models/committee');
@@ -249,9 +250,7 @@ module.exports = function(passport){
         res.render('create_student_council');
     });
 
-    router.get('/search', function(req, res){
-        res.render('search');
-    });
+
 
 
     router.post('/create_student_council', function(req, res){
@@ -431,6 +430,30 @@ module.exports = function(passport){
 
                 for(var membership in user.comm) {
                     var membership_id = user.comm[membership].membership_id;
+                    console.log("gefundene membership_id"+membership_id);
+                    if(validator.isNull(membership_id))
+                    {
+                        var membershipsave = new membership_model({
+                            grem_id: req.body.comm[membership].committee,
+                            from : req.body.comm[membership].from,
+                            to : req.body.comm[membership].to,
+                            reason : req.body.comm[membership].reason,
+                            user_id : user._id,
+                            council_id : req.body.comm[membership].council_id,
+                            successor: req.body.comm[membership].successor || false
+
+                        });
+                        membershipsave.save(function (err,user) {
+                            if (err) {
+                                res.status(err.status || 500);
+                                res.render('error', {
+                                    message: err.message,
+                                    error: err
+                                })
+                            }
+                        });
+                    }
+                    else
                     membership_model.findOne({_id: membership_id}, function (err, comm) {
                         if (err) {
                             res.status(err.status || 500);
@@ -470,7 +493,7 @@ module.exports = function(passport){
                                         console.log('Save Membership: ' + comm);
                                         comm.save(function (err) {
                                             if (err) {
-                                                res.status(500);
+
                                                 res.render('error', {
                                                     message: err.message,
                                                     error: err
@@ -478,11 +501,11 @@ module.exports = function(passport){
                                             }
 
                                         });
-
+                                        res.render('success', {msg: 'Nuter erfolgreich geaendert'});
                                     }
 
 
-                                    res.render('success', {msg: 'Nuter erfolgreich geaendert'});
+
 
 
 
@@ -581,6 +604,128 @@ module.exports = function(passport){
     req.logout();
     res.redirect('/');
   });
+    router.get('/search', function(req, res) {
+        period_model.find().lean().exec(function (err, periods) {
 
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
+            else if (!periods) {
+                res.status(404);
+                res.send('Period not found');
+            }
+            else {
+
+                committee_model.find().lean().exec(function (err, committees) {
+                    if (err) {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            error: err
+                        });
+                    }
+                    else if (!committees) {
+                        res.status(404);
+                        res.send('Committee not found');
+                    }
+                    else {
+                        student_council_model.find().lean().exec(function (err, councils) {
+                            if (err) {
+                                res.status(err.status || 500);
+                                res.render('error', {
+                                    message: err.message,
+                                    error: err
+                                });
+                            }
+                            else if (!councils) {
+                                res.status(404);
+                                res.send('Council not found');
+                            }
+                            else {
+
+                        res.render('search', {periods: periods, moment: moment, committees: committees, councils: councils});
+                    }
+
+                    });
+            }
+
+        });
+            }
+            });
+        });
+
+    router.post('/search', function(req, res) {
+        console.log("Search Result: ");console.log(req.body);
+        var res_array = [];
+        var query_user = {};
+        if(!validator.isNull(req.body.firstname)) query_user.firstname = req.body.firstname;
+        if(!validator.isNull(req.body.lastname)) query_user.lastname = req.body.lastname;
+
+        console.log("created Searchquery: ");console.log(query_user);
+
+        grm_user_model.find(query_user,function(err,user){
+
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
+            else if (!user) {
+                res.status(404);
+                res.send('User not found');
+            }
+            else {
+                console.log("from DB result: ");
+                console.log(user);
+                var query_period = {};
+                if(!validator.isNull(req.body.period)) query_period._id = req.body.period;
+                console.log("Query for Period Search: ");console.log(query_period);
+                period_model.find(query_period,function(err,period) {
+                    if (err) {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            error: err
+                        });
+                    }
+                    else if (!period) {
+                        res.status(404);
+                        res.send('period not found');
+                    }
+                    else {
+                        var membership_query = {};
+                        if(!validator.isNull(req.body.committee)) membership_query.grem_id = req.body.committee;
+                        if(!validator.isNull(req.body.council)) membership_query.council_id = req.body.council;
+
+                        membership_model.find(membership_query,function(err,memberships) {
+                            if (err) {
+                                res.status(err.status || 500);
+                                res.render('error', {
+                                    message: err.message,
+                                    error: err
+                                });
+                            }
+                            else if (!memberships) {
+                                res.status(404);
+                                res.send('Membership not found');
+                            }
+                            else {
+                                res.render('search_result',{users: user, memberships: memberships, periods: period})
+                            }
+                        })
+                    }
+
+
+                })
+            }
+        });
+
+    });
   return router;
 };

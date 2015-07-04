@@ -19,6 +19,7 @@
     "mongoose": "*",
     "bcrypt-nodejs" : "*",
     "connect-flash" : "*",
-    "moment": "*"
+    "moment": "*",
+    "validator": "*"
   }
 }

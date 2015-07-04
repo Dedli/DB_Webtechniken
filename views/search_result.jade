@@ -1,0 +1,18 @@
+//
+   Created by daniel on 04.07.2015.
+
+extends layout
+
+block content
+    h1 Suchergebnisse
+
+        each mem in memberships
+                p Gremium: #{mem.grem_id}
+                p Von: #{mem.from}
+                p Bis: #{mem.to}
+                p Grund: #{mem.reason}
+                each usr in users
+                    if (mem.user_id == usr._id)
+                    p Vorname: #{usr.firstname} Nachname: #{usr.lastname}
+                    p Matrikelnummer: #{usr.matr_nr}
+                    p Nutzerkennzeichen: #{usr.nkz}

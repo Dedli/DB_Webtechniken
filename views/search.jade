@@ -1,3 +1,39 @@
 //
    Created by daniel on 04.07.2015.
 
+extends layout
+
+block content
+
+    form(action="/search",method="post")
+        div
+            label(for='firstname')
+                b Vorname:&nbsp
+                    input(type='text',name='firstname', value='', placeholder='Vorname')
+        div
+            label(for='lastname')
+                b Nachname:&nbsp
+                    input(type='text',name='lastname', value='', placeholder='Nachname')
+        div
+            label(for='period')
+                b Amtsperiode:&nbsp
+                    select(name='period')
+                        <option value="">Bitte ausw&auml;hlen</option>
+                        each per, i in periods
+                                <option value="#{per._id}">#{moment(per.from).format("DD.MM.YYYY")} - #{moment(per.to).format("DD.MM.YYYY")}</option>
+        div
+            label(for='committee')
+                b Gremium:&nbsp
+                    select(name='committee')
+                        <option value="">Bitte ausw&auml;hlen</option>
+                        each comm in committees
+                            <option value="#{comm._id}">#{comm._name}</option>
+        div
+            label(for='council')
+                b Fachschaft:&nbsp
+                    select(name='council')
+                        <option value="">Bitte ausw&auml;hlen</option>
+                        each cou in councils
+                            <option value="#{cou._id}">#{cou._name}</option>
+        div
+            button(type='submit') Suchen
