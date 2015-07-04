@@ -10,7 +10,9 @@ block content
         h2 Nutzer Anlegen
         form(action='/create_grem_user',method='post')
             include create_user_form
+            include create_council_membership_form
             include create_grem_form
+
             div
                button(type='submit',id='submitCreateUser') Nutzer anlegen
   hr
@@ -101,3 +103,5 @@ block content
                     td
                         a(href='#',onclick="edit_period"+index+".submit()")
                             span.glyphicon.glyphicon-edit
+  hr
+  a(href='/search') zum Suchinterface

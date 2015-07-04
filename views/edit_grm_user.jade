@@ -3,9 +3,13 @@
 include layout
 script(type='text/javascript').
     var array = 0;
+    var arryCouncil = 0;
     function raiseArray(){
         array++;
         alert(array);
+    }
+    function raiseArray(){
+        arrayCouncil++;
     }
     function cloneGrm(){
         array ++;
@@ -25,10 +29,28 @@ script(type='text/javascript').
         node.removeChild(child);
         array--;
     }
+    function cloneCouncil(){
+    arrayCouncil ++;
+    var clone = document.getElementById('cou').cloneNode(true);
+    clone.classList.remove("hidden");
+    clone.getElementsByTagName("button")[0].removeAttribute("style");
+    clone.getElementsByTagName("select")[0].setAttribute("name", "councils["+arrayCouncil+"][council_id]");
+    clone.getElementsByTagName("input")[0].setAttribute("name", "councils["+arrayCouncil+"][from]");
+    clone.getElementsByTagName("input")[1].setAttribute("name", "councils["+arrayCouncil+"][to]");
+    clone.getElementsByTagName("input")[2].setAttribute("name", "councils["+arrayCouncil+"][user_id]");
+    clone.getElementsByTagName("input")[3].setAttribute("name", "councils["+arrayCouncil+"][_id]");
 
+    document.getElementById('insertGrm').appendChild(clone);
+    }
+    function deleteCouncil(child){
+    var node = document.getElementById("insertCouncil");
+    node.removeChild(child);
+    arrayCouncil--;
+    }
 block content
     h3=user
     h3=memberships
+    h3=councils
     h1 Nuter &auml;ndern
 
     div#Grm.hidden
@@ -48,7 +70,6 @@ block content
             label(for='comm['+index+'][reason]')
                 b Grund f&uuml;r Austritt/Eintritt ausserhalb der Amtsperiode&nbsp;
                     input(type='text',placeholder='Grund Austritt/Eintritt ',name='comm[0][reason]')
-
         br
         label(for='comm[0][council_id]')
             b Fachschaftsmitgliedschaft:&nbsp
@@ -56,7 +77,21 @@ block content
                     each fachschaft in student_council
                         <option value="#{fachschaft._id}">#{fachschaft._name}</option>
         br
-
+    div#cou.hidden
+        label(for='council[0][council_id]')
+            b Fachschaftsmitgliedschaft:&nbsp
+                select(onload='raiseArrayCouncil()',autocomplete='off', value='', name='councils[0][council_id]')
+                    each fachschaft in student_council
+                        <option value="#{fachschaft._id}">#{fachschaft._name}</option>
+        label(for='councils[0][from]')
+            b &nbsp;von:&nbsp;
+                input(type='date',value='',placeholder='Von: ',name='councils[0][from]')
+        label(for='councils[0][to]')
+            b &nbsp;bis:&nbsp;
+                input(type='date',value='',placeholder='Bis: ',name='councils[0][to]')
+                input(type='hidden',value='',name='councils[0][user_id]')
+                input(type='hidden',value='',name='councils[0][_id]')
+                button(style='display: none',type='button',id='DelFS',onclick='deleteCou(this.parentNode.parentNode.parentNode)') &#045;
     form(action='/edit_grm_user/'+user._id,method='post')
         div
             h3 Nutzerdaten
@@ -79,13 +114,36 @@ block content
                 b Nutzerkennzeichen:&nbsp
                     input(id='nkz',type='text',value=user.nkz,placeholder='Nutzerkennzeichen',name='nkz', required)
         div
+        each council,index in councils
+            div
+                label(for='councils['+index+'][council_id]')
+                    b Fachschaftsmitgliedschaft:&nbsp
+                        select(onload='raiseArrayCouncil()', name='councils['+index+'][council_id]')
+                            each fachschaft in student_council
+                                if (fachschaft._id == council.council_id)
+                                    <option value="#{fachschaft._id}" selected>#{fachschaft._name}</option>
+                                else
+                                    <option value="#{fachschaft._id}">#{fachschaft._name}</option>
+                label(for='councils['+index+'][from]')
+                    b &nbsp;von:&nbsp;
+                        input(type='date',value=moment(council.from).format("YYYY-MM-DD"),placeholder='Von: ',name='councils['+index+'][from]')
+                label(for='councils['+index+'][to]')
+                    b &nbsp;bis:&nbsp;
+                        input(type='date',value=moment(council.to).format("YYYY-MM-DD"),placeholder='Bis: ',name='councils['+index+'][to]')
+                        input(type='hidden',value=user._id,name='councils['+index+'][user_id]')
+                        input(type='hidden',value=council._id,name='councils['+index+'][_id]')
+                        button(style='display: none',type='button',id='DelFS',onclick='deleteCou(this.parentNode.parentNode.parentNode)') &#045;
+        div#insertCouncil
         each membership,index in memberships
             div
                 label(for='comm['+index+'][committee]')
                     b Gremienmitgliedschaft:&nbsp
-                        select(value=membership.grem_id, name='comm['+index+'][committee]')
+                        select(name='comm['+index+'][committee]')
                             each gremium, i in committees
-                                <option value="#{gremium._id}">#{gremium._name}</option>
+                                if (gremium._id == membership.grem_id)
+                                    <option selected value="#{gremium._id}">#{gremium._name}</option>
+                                else
+                                    <option value="#{gremium._id}">#{gremium._name}</option>
                 label(for='comm['+index+'][from]')
                     b &nbsp;von:&nbsp;
                         input(type='date',value=moment(membership.from).format("YYYY-MM-DD"),placeholder='Von: ',name='comm['+index+'][from]')
@@ -104,7 +162,10 @@ block content
                     b Fachschaftsmitgliedschaft:&nbsp
                         select(onload='raiseArray()',autocomplete='off', value=membership.council_id, name='comm['+index+'][council_id]')
                             each fachschaft in student_council
-                                <option value="#{fachschaft._id}">#{fachschaft._name}</option>
+                                if (fachschaft._id == membership.council_id)
+                                    <option selected value="#{fachschaft._id}">#{fachschaft._name}</option>
+                                else
+                                    <option value="#{fachschaft._id}">#{fachschaft._name}</option>
                      input(type='hidden',name='comm['+index+'][membership_id]',value=membership._id)
                 br
                 label(for='successor')

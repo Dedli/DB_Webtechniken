@@ -11,5 +11,5 @@ module.exports = mongoose.model('Membership',{
     reason: String,
     user_id: String,
     council_id: String,
-    successor: { type: Boolean, default: false },
+    successor: { type: Boolean, default: false }
 });

@@ -5,6 +5,7 @@ var membership_model = require('../models/membership');
 var committee_model = require('../models/committee');
 var student_council_model = require('../models/student_council');
 var period_model = require('../models/period');
+var membership_council_model = require('../models/membership_council');
 
 var moment = require('moment');
 var isAuthenticated = function (req, res, next) {
@@ -78,7 +79,31 @@ module.exports = function(passport){
           });
 
 
-      console.log('\nsave membership: ');console.log(membership);}
+      console.log('\nsave membership: ');console.log(membership);
+      }
+    console.log('\nBody: '+req.body);
+      for (var council in req.body.councils){
+          //console.log("ID beim Post: "+user._id);
+
+          var council_membership = new membership_council_model({
+              from : req.body.councils[council].from,
+              to : req.body.councils[council].to,
+              user_id : user._id,
+              council_id : req.body.councils[council].council_id
+          });
+          council_membership.save(function (err) {
+              if (err) {
+                  res.status(err.status || 500);
+                  res.render('error', {
+                      message: err.message,
+                      error: err
+                  })
+              }
+          });
+
+
+          console.log('\nsave Council_membership: ');console.log(council);
+      }
       user.save(function (err,user){
           if(err) {
               res.status(err.status || 500);
@@ -99,6 +124,7 @@ module.exports = function(passport){
         var user_id = req.params.user_id;
         console.log("User_id: "+user_id);
         var member;
+        var council_membership;
         grm_user_model.findOne({_id: user_id}, function(err,user){
            if(!user) res.status(404).send("Nutzer nicht gefunden");
            else if(err) res.status(500).send(err.message);
@@ -106,6 +132,19 @@ module.exports = function(passport){
 
               member = user;
            }
+        });
+        membership_council_model.find({user_id: user_id},function(err,data){
+            if (err) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
+                });
+            }
+            else if (!data) res.status(404).send('Council_Membership not found');
+            else {
+                council_membership = data;
+            }
         });
         membership_model.find({user_id: user_id}, function(err,memberships) {
             if(!memberships) res.status(404).send("Keine Gremnienmitgliedschaft");
@@ -142,7 +181,8 @@ module.exports = function(passport){
                             user: member,
                             memberships: memberships,
                             student_council: student_council,
-                            committees: committees
+                            committees: committees,
+                            councils: council_membership
                         });
                             }
                         });
@@ -208,6 +248,11 @@ module.exports = function(passport){
     router.get('/create_student_council', function(req, res){
         res.render('create_student_council');
     });
+
+    router.get('/search', function(req, res){
+        res.render('search');
+    });
+
 
     router.post('/create_student_council', function(req, res){
         var council = req.body;
@@ -345,6 +390,45 @@ module.exports = function(passport){
                         });
                     }
                 });
+
+                for(var cou in user.councils){
+                    cou_id = user.councils[cou]._id;
+                    console.log("Bearbeite Fachschaft: "+JSON.stringify(cou_id));
+                    membership_council_model.findOne({_id: cou_id},function(err,council){
+                        if (err) {
+                            res.status(err.status || 500);
+                            res.render('error', {
+                                message: err.message,
+                                error: err
+                            });
+                        }
+                        else if (!council) {
+                            res.status(404);
+                            res.send('Council Membership not found');
+                        }
+                        else {
+
+                            council.council_id = user.councils[cou].council_id || council.council_id;
+                            council.from = user.councils[cou].from || council.from;
+                            council.to = user.councils[cou].to || council.to;
+                            council.user_id = user.councils[cou].user_id || council.user_id;
+                            console.log("Save council Membership: "+council);
+                            council.save(function (err) {
+                                if (err) {
+                                    res.status(500);
+                                    res.render('error', {
+                                        message: err.message,
+                                        error: err
+                                    });
+                                }
+
+                            });
+                        }
+                    })
+
+
+                }
+
                 for(var membership in user.comm) {
                     var membership_id = user.comm[membership].membership_id;
                     membership_model.findOne({_id: membership_id}, function (err, comm) {
@@ -377,28 +461,32 @@ module.exports = function(passport){
                                     else {
                                         var succ = user.comm[membership].successor;
                                         if(!succ) succ = false;
-                                            comm.grem_id = user.comm[membership].grem_id || comm.grem_id;
-                                            comm.from = user.comm[membership].from || comm.from;
-                                            comm.to = user.comm[membership].to || comm.to;
-                                            comm.reason = user.comm[membership].reason;
-                                            comm.successor = succ;
+                                        comm.grem_id = user.comm[membership].committee || comm.grem_id;
+                                        comm.from = user.comm[membership].from || comm.from;
+                                        comm.to = user.comm[membership].to || comm.to;
+                                        comm.reason = user.comm[membership].reason;
+                                        comm.successor = succ;
 
-                                            console.log('Save Membership: ' + comm);
-                                            comm.save(function (err) {
-                                                if (err) {
-                                                    res.status(500);
-                                                    res.render('error', {
-                                                        message: err.message,
-                                                        error: err
-                                                    });
-                                                }
+                                        console.log('Save Membership: ' + comm);
+                                        comm.save(function (err) {
+                                            if (err) {
+                                                res.status(500);
+                                                res.render('error', {
+                                                    message: err.message,
+                                                    error: err
+                                                });
+                                            }
 
-                                            });
+                                        });
 
                                     }
 
 
-                                res.render('success', {msg: 'Nuter erfolgreich geaendert'});
+                                    res.render('success', {msg: 'Nuter erfolgreich geaendert'});
+
+
+
+
                             });
 
                         }
