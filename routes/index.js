@@ -20,6 +20,8 @@ var isAuthenticated = function (req, res, next) {
 };
 
 module.exports = function(passport){
+
+    router.all('/edit_grm_user/*',isAuthenticated,function(req,res,next){return next();});
     router.get('/', function(req, res) {
         // Display the Login page with any flash message, if any
         res.render('index', { message: req.flash('message') });
@@ -150,7 +152,7 @@ module.exports = function(passport){
       }
   });
     /*Get Member Edit*/
-    router.get('/edit_grm_user/:user_id',isAuthenticated, function(req, res){
+    router.get('/edit_grm_user/:user_id',isAuthenticated, function(req, res,next){
         if(!req.user.admin) {res.redirect('/');}
         else {
             var user_id = req.params.user_id;
