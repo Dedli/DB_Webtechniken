@@ -9,6 +9,7 @@ module.exports = mongoose.model('Membership',{
     from: Date,
     to: Date,
     reason: String,
+    period_id: String,
     user_id: String,
     council_id: String,
     successor: { type: Boolean, default: false }

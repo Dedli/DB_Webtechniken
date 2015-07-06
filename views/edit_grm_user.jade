@@ -2,17 +2,9 @@
    Created by daniel on 14.06.2015.
 include layout
 script(type='text/javascript').
-    var array = 0;
-    var arryCouncil = 0;
-    function raiseArray(){
-        array++;
-        alert(array);
-    }
-    function raiseArray(){
-        arrayCouncil++;
-    }
-    function cloneGrm(){
-        array ++;
+
+    function cloneGrm(i){
+        var array = i+1;
         var clonegrm = document.getElementById('Grm').cloneNode(true);
         clonegrm.classList.remove("hidden");
         clonegrm.getElementsByTagName("button")[0].removeAttribute("style");
@@ -23,6 +15,7 @@ script(type='text/javascript').
         clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][reason]");
         clonegrm.getElementsByTagName("input")[3].setAttribute("name", "comm["+array+"][membership_id]");
         clonegrm.getElementsByTagName("input")[4].setAttribute("name", "comm["+array+"][successor]");
+
 
 
         document.getElementById('insertGrm').appendChild(clonegrm);
@@ -43,7 +36,7 @@ script(type='text/javascript').
     clone.getElementsByTagName("input")[2].setAttribute("name", "councils["+arrayCouncil+"][user_id]");
     clone.getElementsByTagName("input")[3].setAttribute("name", "councils["+arrayCouncil+"][_id]");
 
-    document.getElementById('insertGrm').appendChild(clone);
+    document.getElementById('insertCouncil').appendChild(clone);
     }
     function deleteCouncil(child){
     var node = document.getElementById("insertCouncil");
@@ -59,7 +52,7 @@ block content
     div#Grm.hidden
         label(for='comm[0][committee]')
             b Gremienmitgliedschaft:&nbsp
-                select(list='gremien' autocomplete='on', type='text', value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
+                select(name='comm[0][committee]')
                     each gremium, index in committees
                         <option value="#{gremium._id}">#{gremium._name}</option>
         label(for='comm[0][from]')
@@ -76,7 +69,7 @@ block content
         br
         label(for='comm[0][council_id]')
             b Fachschaftsmitgliedschaft:&nbsp
-                select(autocomplete='off', value='', placeholder='Fachschaft ausw\u00e4hlen', name='comm[0][council_id]')
+                select(name='comm[0][council_id]')
                     each fachschaft in student_council
                         <option value="#{fachschaft._id}">#{fachschaft._name}</option>
         br
@@ -84,6 +77,7 @@ block content
         label(for='successor')
             b Nachr&uuml;cker:&nbsp;
                     input( type="checkbox" name='comm[0][successor]' value="true" )
+
     div#cou.hidden
         label(for='council[0][council_id]')
             b Fachschaftsmitgliedschaft:&nbsp
@@ -139,7 +133,7 @@ block content
                         input(type='date',value=moment(council.to).format("YYYY-MM-DD"),placeholder='Bis: ',name='councils['+index+'][to]')
                         input(type='hidden',value=user._id,name='councils['+index+'][user_id]')
                         input(type='hidden',value=council._id,name='councils['+index+'][_id]')
-                        button(style='display: none',type='button',id='DelFS',onclick='deleteCou(this.parentNode.parentNode.parentNode)') &#045;
+                        button(style='display: none',type='button',onclick='deleteCouncil(this.parentNode.parentNode.parentNode)') &#045;
         div#insertCouncil
         each membership,index in memberships
             div
@@ -154,10 +148,18 @@ block content
                 label(for='comm['+index+'][from]')
                     b &nbsp;von:&nbsp;
                         input(type='date',value=moment(membership.from).format("YYYY-MM-DD"),placeholder='Von: ',name='comm['+index+'][from]')
+                label(for='comm['+index+'][period_id]')
+                    b Amtszeit:&nbsp
+                        select(name='comm['+index+'][period_id]')
+                            each period in periods
+                                if (membership.period_id == period._id)
+                                    <option value="#{period._id}" selected>#{moment(period.from).format("DD.MM.YYYY")} - #{moment(period.to).format("DD.MM.YYYY")}</option>
+                                else
+                                    <option value="#{period._id}">#{moment(period.from).format("DD.MM.YYYY")} - #{moment(period.to).format("DD.MM.YYYY")}</option>
                 label(for='comm['+index+'][to]')
                     b &nbsp;bis:&nbsp;
                         input(type='date',value=moment(membership.to).format("YYYY-MM-DD"),placeholder='Bis: ',name='comm['+index+'][to]')
-                        button(style='display: none',type='button',id='DelFS',onclick='deleteGrm(this.parentNode.parentNode.parentNode)') &#045;
+                        button(style='display: none',type='button',onclick='deleteGrm(this.parentNode.parentNode.parentNode)') &#045;
 
                 div
                     label(for='comm['+index+'][reason]')
@@ -167,7 +169,7 @@ block content
                 br
                 label(for='FS')
                     b Fachschaftsmitgliedschaft:&nbsp
-                        select(onload='raiseArray()',autocomplete='off', value=membership.council_id, name='comm['+index+'][council_id]')
+                        select(value=membership.council_id, name='comm['+index+'][council_id]')
                             each fachschaft in student_council
                                 if (fachschaft._id == membership.council_id)
                                     <option selected value="#{fachschaft._id}">#{fachschaft._name}</option>
@@ -181,8 +183,9 @@ block content
                             input( type="checkbox" name='comm['+index+'][successor]' value="true" checked)
                         else
                             input( type="checkbox" name='comm['+index+'][successor]' value="true")
+                button(type='button',id='CloneGrmbutton',onclick="cloneGrm("+index+")",title='hinzufuegen') &#043;
         div#insertGrm
         div#cloneGrm
-        button(type='button',id='CloneGrmbutton',onclick="cloneGrm()",title='hinzufuegen') &#043;
+
         br
         button(type='submit',title='Aenderungen abschicken',) Best&auml;tigen
