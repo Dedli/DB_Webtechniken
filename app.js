@@ -4,7 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var session = require('express-session');
+var methodOverride = require('method-override');
 
 var dbConfig = require('./db');
 var mongoose = require('mongoose');
@@ -26,8 +27,7 @@ app.use(cookieParser());
 
 // Configuring Passport
 var passport = require('passport');
-var expressSession = require('express-session');
-app.use(expressSession({resave: true,saveUninitialized: true,secret: 'mySecretKey'}));
+app.use(session({resave: false,saveUninitialized: true,secret: 'mySecretKey'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -39,7 +39,7 @@ app.use(flash());
 // Initialize Passport
 var initPassport = require('./passport/init');
 initPassport(passport);
-
+app.use(methodOverride());
 var routes = require('./routes/index')(passport);
 app.use('/', routes);
 // catch 404 and forward to error handler

@@ -5,14 +5,48 @@ extends layout
 
 block content
     h1 Suchergebnisse
+    - var n = 0
+    each usr,i in users
+        each mem,k in memberships
+            if (mem.user_id == usr._id)
+                if(n==0)
+                      h3 Ergebnis #{i+1}:
+                      h4 Nutzerdaten
+                      p Vorname: #{usr.firstname}
+                      p Nachname: #{usr.lastname}
+                      p Matrikelnummer: #{usr.matr_nr}
+                      p Nutzerkennzeichen: #{usr.nkz}
+                      hr
+                      h4 Gremienmitgliedschaft
+                      each comm in committees
+                          if(comm._id == mem.grem_id)
+                            p Gremium: #{comm._name}
+                      p Von: #{moment(mem.from).format("DD.MM.YYYY")}
+                      if(mem.successor)
+                          p Nachr&uuml;cker: ja
+                      else
+                          p Nachr&uuml;cker: nein
+                      p Bis: #{moment(mem.to).format("DD.MM.YYYY")}
+                      p Grund: #{mem.reason}
+                      each per in periods
+                          if(mem.period_id == per._id)
+                              p Periode: #{moment(per.from).format("DD.MM.YYYY")} - #{moment(per.to).format("DD.MM.YYYY")}
 
-        each mem in memberships
-                p Gremium: #{mem.grem_id}
-                p Von: #{mem.from}
-                p Bis: #{mem.to}
-                p Grund: #{mem.reason}
-                each usr in users
-                    if (mem.user_id == usr._id)
-                    p Vorname: #{usr.firstname} Nachname: #{usr.lastname}
-                    p Matrikelnummer: #{usr.matr_nr}
-                    p Nutzerkennzeichen: #{usr.nkz}
+                      - n = 1
+                else if (n == 1)
+                      hr
+                      h4 Gremienmitgliedschaft
+                      each comm in committees
+                          if(comm._id == mem.grem_id)
+                              p Gremium: #{comm._name}
+                      p Von: #{moment(mem.from).format("DD.MM.YYYY")}
+                      if(mem.successor)
+                          p Nachr&uuml;cker: ja
+                      else
+                          p Nachr&uuml;cker: nein
+                      p Bis: #{moment(mem.to).format("DD.MM.YYYY")}
+                      p Grund: #{mem.reason}
+                      each per in periods
+                          if(mem.period_id == per._id)
+                              p Periode: #{moment(per.from).format("DD.MM.YYYY")} - #{moment(per.to).format("DD.MM.YYYY")}
+        - n = 0

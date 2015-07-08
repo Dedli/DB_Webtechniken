@@ -21,7 +21,7 @@ var isAuthenticated = function (req, res, next) {
 
 module.exports = function(passport){
 
-    router.all('/edit_grm_user/*',isAuthenticated,function(req,res,next){return next();});
+
     router.get('/', function(req, res) {
         // Display the Login page with any flash message, if any
         res.render('index', { message: req.flash('message') });
@@ -71,7 +71,95 @@ module.exports = function(passport){
         })(req, res, next)
     });
 
+    /*Get Member Edit*/
+    router.get('/edit_grm_user/:user_id',isAuthenticated, function(req,res){
+        if(!req.user.admin) {res.redirect('/');res.flush('Keine Berechtigung');}
+        else {
+            var user_id = req.params.user_id;
+            console.log("User_id: " + user_id);
+            var member;
+            var council_membership;
+            grm_user_model.findOne({_id: user_id}, function (err, user) {
+                if (!user) res.status(404).send("Nutzer nicht gefunden");
+                else if (err) res.status(500).send(err.message);
+                else {
 
+                    member = user;
+                }
+            });
+            membership_council_model.find({user_id: user_id}, function (err, data) {
+                if (err) {
+                    res.status(err.status || 500);
+                    res.render('error', {
+                        message: err.message,
+                        error: err
+                    });
+                }
+                else if (!data) res.status(404).send('Council_Membership not found');
+                else {
+                    council_membership = data;
+                }
+            });
+            membership_model.find({user_id: user_id}, function (err, memberships) {
+                if (!memberships) res.status(404).send("Keine Gremnienmitgliedschaft");
+                else if (err) res.status(500).send(err.message);
+                else {
+                    JSON.stringify(memberships);
+                    console.log("Membership from DB " + JSON.stringify(memberships));
+                    JSON.stringify(member);
+                    committee_model.find().lean().exec(function (err, committees) {
+                        if (err) {
+                            res.status(err.status || 500);
+                            res.render('error', {
+                                message: err.message,
+                                error: err
+                            });
+                        }
+                        else if (!committees) res.status(404).send('Committee not found');
+                        else {
+                            JSON.stringify(committees);
+
+                            student_council_model.find().lean().exec(function (err, student_council) {
+                                if (err) {
+                                    res.status(err.status || 500);
+                                    res.render('error', {
+                                        message: err.message,
+                                        error: err
+                                    });
+                                }
+                                else if (!student_council) res.status(404).send('Student council not found');
+                                else {
+                                    period_model.find().lean().exec(function (err, periods) {
+                                        if (err) {
+                                            res.status(err.status || 500);
+                                            res.render('error', {
+                                                message: err.message,
+                                                error: err
+                                            });
+                                        }
+                                        else if (!periods) res.status(404).send('Period not found');
+                                        else {
+
+                                            res.render('edit_grm_user', {
+                                                moment: moment,
+                                                user: member,
+                                                memberships: memberships,
+                                                student_council: student_council,
+                                                committees: committees,
+                                                councils: council_membership,
+                                                periods: periods
+                                            });
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
     /* Handle grem_user Create Post */
   router.post('/create_grem_user',isAuthenticated, function(req, res, next){
       if(!req.user.admin) {res.redirect('/');}
@@ -151,95 +239,7 @@ module.exports = function(passport){
           })
       }
   });
-    /*Get Member Edit*/
-    router.get('/edit_grm_user/:user_id',isAuthenticated, function(req, res,next){
-        if(!req.user.admin) {res.redirect('/');}
-        else {
-            var user_id = req.params.user_id;
-            console.log("User_id: " + user_id);
-            var member;
-            var council_membership;
-            grm_user_model.findOne({_id: user_id}, function (err, user) {
-                if (!user) res.status(404).send("Nutzer nicht gefunden");
-                else if (err) res.status(500).send(err.message);
-                else {
 
-                    member = user;
-                }
-            });
-            membership_council_model.find({user_id: user_id}, function (err, data) {
-                if (err) {
-                    res.status(err.status || 500);
-                    res.render('error', {
-                        message: err.message,
-                        error: err
-                    });
-                }
-                else if (!data) res.status(404).send('Council_Membership not found');
-                else {
-                    council_membership = data;
-                }
-            });
-            membership_model.find({user_id: user_id}, isAuthenticated, function (err, memberships) {
-                if (!memberships) res.status(404).send("Keine Gremnienmitgliedschaft");
-                else if (err) res.status(500).send(err.message);
-                else {
-                    JSON.stringify(memberships);
-                    console.log("Membership from DB " + JSON.stringify(memberships));
-                    JSON.stringify(member);
-                    committee_model.find().lean().exec(function (err, committees) {
-                        if (err) {
-                            res.status(err.status || 500);
-                            res.render('error', {
-                                message: err.message,
-                                error: err
-                            });
-                        }
-                        else if (!committees) res.status(404).send('Committee not found');
-                        else {
-                            JSON.stringify(committees);
-
-                            student_council_model.find().lean().exec(function (err, student_council) {
-                                if (err) {
-                                    res.status(err.status || 500);
-                                    res.render('error', {
-                                        message: err.message,
-                                        error: err
-                                    });
-                                }
-                                else if (!student_council) res.status(404).send('Student council not found');
-                                else {
-                                    period_model.find().lean().exec(function (err, periods) {
-                                        if (err) {
-                                            res.status(err.status || 500);
-                                            res.render('error', {
-                                                message: err.message,
-                                                error: err
-                                            });
-                                        }
-                                        else if (!periods) res.status(404).send('Period not found');
-                                        else {
-
-                                            res.render('edit_grm_user', {
-                                                moment: moment,
-                                                user: member,
-                                                memberships: memberships,
-                                                student_council: student_council,
-                                                committees: committees,
-                                                councils: council_membership,
-                                                periods: periods
-                                            });
-
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
-    });
 
     router.get('/create_committee',isAuthenticated, function(req, res){
         res.render('create_committee');
@@ -267,7 +267,7 @@ module.exports = function(passport){
         }
     });
 
-    router.post('/edit_committee/:_id', function(req, res) {
+    router.post('/edit_committee/:_id',isAuthenticated, function(req, res) {
         if(!req.user.admin) {res.redirect('/');}
         else {
             var committee = req.body;
@@ -609,7 +609,7 @@ module.exports = function(passport){
           else if(!grm_user_models) res.status(404).send('Keine User in Datenbank');
           else {
 
-              grm_user_model.find().lean().exec(function (err, grm_user_models) {
+              grm_user_model.find().lean().exec(function (err, grm_users) {
                   if (err) {
                       res.status(err.status || 500);
                       res.render('error', {
@@ -656,7 +656,7 @@ module.exports = function(passport){
 
 
                       res.render('admin', {
-                          grm_members: grm_user_models,
+                          grm_members: grm_users,
                           user: req.user,
                           title: 'testuser',
                           committees: committees,
@@ -756,9 +756,65 @@ module.exports = function(passport){
             }
             else if (!mem) {
                 res.status(404);
-                res.send('User not found');
+                res.send('Membership not found');
             }
             else {
+                query = {};
+                if(!validator.isNull(req.body.firstname)) query.firstname = req.body.firstname;
+                if(!validator.isNull(req.body.lastname)) query.lastname = req.body.lastname;
+                grm_user_model.find(query,function(err,users){
+                    if (err) {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            error: err
+                        });
+                    }
+                    else if (!users) {
+                        res.status(404);
+                        res.send('User not found');
+                    }
+                    else{
+                        console.log("Found users");console.log(users);
+
+                        committee_model.find({},function(err,comm){
+                            if (err) {
+                                res.status(err.status || 500);
+                                res.render('error', {
+                                    message: err.message,
+                                    error: err
+                                });
+                            }
+                            else if (!comm) {
+                                res.status(404);
+                                res.send('Committee not found');
+                            }
+                            else {
+                                period_model.find({},function(err,per){
+                                    if (err) {
+                                        res.status(err.status || 500);
+                                        res.render('error', {
+                                            message: err.message,
+                                            error: err
+                                        });
+                                    }
+                                    else if (!per) {
+                                        res.status(404);
+                                        res.send('Period not found');
+                                    }
+                                    else {
+                                        res.render('search_result',{memberships: mem, users:users, moment: moment, periods: per, committees: comm})
+                                    }
+
+                            });
+                            }
+
+                        });
+
+
+                    }
+
+                });
                 console.log('gefundene Memberships: ');console.log(mem);
 
 

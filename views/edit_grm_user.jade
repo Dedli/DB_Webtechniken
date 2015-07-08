@@ -1,98 +1,12 @@
 //
    Created by daniel on 14.06.2015.
 include layout
-script(type='text/javascript').
-
-    function cloneGrm(i){
-        var array = i+1;
-        var clonegrm = document.getElementById('Grm').cloneNode(true);
-        clonegrm.classList.remove("hidden");
-        clonegrm.getElementsByTagName("button")[0].removeAttribute("style");
-        clonegrm.getElementsByTagName("select")[0].setAttribute("name", "comm["+array+"][committee]");
-        clonegrm.getElementsByTagName("select")[1].setAttribute("name", "comm["+array+"][council_id]");
-        clonegrm.getElementsByTagName("input")[0].setAttribute("name", "comm["+array+"][from]");
-        clonegrm.getElementsByTagName("input")[1].setAttribute("name", "comm["+array+"][to]");
-        clonegrm.getElementsByTagName("input")[2].setAttribute("name", "comm["+array+"][reason]");
-        clonegrm.getElementsByTagName("input")[3].setAttribute("name", "comm["+array+"][membership_id]");
-        clonegrm.getElementsByTagName("input")[4].setAttribute("name", "comm["+array+"][successor]");
-
-
-
-        document.getElementById('insertGrm').appendChild(clonegrm);
-    }
-    function deleteGrm(child){
-        var node = document.getElementById("insertGrm");
-        node.removeChild(child);
-        array--;
-    }
-    function cloneCouncil(){
-    arrayCouncil ++;
-    var clone = document.getElementById('cou').cloneNode(true);
-    clone.classList.remove("hidden");
-    clone.getElementsByTagName("button")[0].removeAttribute("style");
-    clone.getElementsByTagName("select")[0].setAttribute("name", "councils["+arrayCouncil+"][council_id]");
-    clone.getElementsByTagName("input")[0].setAttribute("name", "councils["+arrayCouncil+"][from]");
-    clone.getElementsByTagName("input")[1].setAttribute("name", "councils["+arrayCouncil+"][to]");
-    clone.getElementsByTagName("input")[2].setAttribute("name", "councils["+arrayCouncil+"][user_id]");
-    clone.getElementsByTagName("input")[3].setAttribute("name", "councils["+arrayCouncil+"][_id]");
-
-    document.getElementById('insertCouncil').appendChild(clone);
-    }
-    function deleteCouncil(child){
-    var node = document.getElementById("insertCouncil");
-    node.removeChild(child);
-    arrayCouncil--;
-    }
 block content
     h3=user
     h3=memberships
     h3=councils
     h1 Nuter &auml;ndern
 
-    div#Grm.hidden
-        label(for='comm[0][committee]')
-            b Gremienmitgliedschaft:&nbsp
-                select(name='comm[0][committee]')
-                    each gremium, index in committees
-                        <option value="#{gremium._id}">#{gremium._name}</option>
-        label(for='comm[0][from]')
-            b &nbsp;von:&nbsp;
-                input(type='date',value='',placeholder='Von: ',name='comm[0][from]')
-        label(for='comm[0][to]')
-            b &nbsp;bis:&nbsp;
-                input(type='date',value='',placeholder='Bis: ',name='comm[0][to]')
-                button(style='display: none',type='button',id='DelFS',onclick='deleteGrm(this.parentNode.parentNode.parentNode)') &#045;
-        div
-            label(for='comm[0][reason]')
-                b Grund f&uuml;r Austritt/Eintritt ausserhalb der Amtsperiode&nbsp;
-                    input(type='text',placeholder='Grund Austritt/Eintritt ',name='comm[0][reason]')
-        br
-        label(for='comm[0][council_id]')
-            b Fachschaftsmitgliedschaft:&nbsp
-                select(name='comm[0][council_id]')
-                    each fachschaft in student_council
-                        <option value="#{fachschaft._id}">#{fachschaft._name}</option>
-        br
-        input(type='hidden',name='comm['+index+'][membership_id]',value='')
-        label(for='successor')
-            b Nachr&uuml;cker:&nbsp;
-                    input( type="checkbox" name='comm[0][successor]' value="true" )
-
-    div#cou.hidden
-        label(for='council[0][council_id]')
-            b Fachschaftsmitgliedschaft:&nbsp
-                select(onload='raiseArrayCouncil()',autocomplete='off', value='', name='councils[0][council_id]')
-                    each fachschaft in student_council
-                        <option value="#{fachschaft._id}">#{fachschaft._name}</option>
-        label(for='councils[0][from]')
-            b &nbsp;von:&nbsp;
-                input(type='date',value='',placeholder='Von: ',name='councils[0][from]')
-        label(for='councils[0][to]')
-            b &nbsp;bis:&nbsp;
-                input(type='date',value='',placeholder='Bis: ',name='councils[0][to]')
-                input(type='hidden',value='',name='councils[0][user_id]')
-                input(type='hidden',value='',name='councils[0][_id]')
-                button(style='display: none',type='button',id='DelFS',onclick='deleteCou(this.parentNode.parentNode.parentNode)') &#045;
     form(action='/edit_grm_user/'+user._id,method='post')
         div
             h3 Nutzerdaten
@@ -119,7 +33,7 @@ block content
             div
                 label(for='councils['+index+'][council_id]')
                     b Fachschaftsmitgliedschaft:&nbsp
-                        select(onload='raiseArrayCouncil()', name='councils['+index+'][council_id]')
+                        select(name='councils['+index+'][council_id]')
                             each fachschaft in student_council
                                 if (fachschaft._id == council.council_id)
                                     <option value="#{fachschaft._id}" selected>#{fachschaft._name}</option>
@@ -134,7 +48,6 @@ block content
                         input(type='hidden',value=user._id,name='councils['+index+'][user_id]')
                         input(type='hidden',value=council._id,name='councils['+index+'][_id]')
                         button(style='display: none',type='button',onclick='deleteCouncil(this.parentNode.parentNode.parentNode)') &#045;
-        div#insertCouncil
         each membership,index in memberships
             div
                 label(for='comm['+index+'][committee]')
@@ -159,7 +72,6 @@ block content
                 label(for='comm['+index+'][to]')
                     b &nbsp;bis:&nbsp;
                         input(type='date',value=moment(membership.to).format("YYYY-MM-DD"),placeholder='Bis: ',name='comm['+index+'][to]')
-                        button(style='display: none',type='button',onclick='deleteGrm(this.parentNode.parentNode.parentNode)') &#045;
 
                 div
                     label(for='comm['+index+'][reason]')
@@ -183,9 +95,5 @@ block content
                             input( type="checkbox" name='comm['+index+'][successor]' value="true" checked)
                         else
                             input( type="checkbox" name='comm['+index+'][successor]' value="true")
-                button(type='button',id='CloneGrmbutton',onclick="cloneGrm("+index+")",title='hinzufuegen') &#043;
-        div#insertGrm
-        div#cloneGrm
-
         br
         button(type='submit',title='Aenderungen abschicken',) Best&auml;tigen
