@@ -1,9 +1,11 @@
+
+//Modulabhänigkeiten
 var LocalStrategy   = require('passport-local').Strategy;
 var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
 
 module.exports = function(passport){
-
+    //Loginstrategie durch passort erstellen
     passport.use('login', new LocalStrategy({
                 passReqToCallback : true
             },
@@ -33,7 +35,7 @@ module.exports = function(passport){
             })
     );
 
-
+//Verschlüsseln des Passworts
     var isValidPassword = function(user, password){
         return bCrypt.compareSync(password, user.password);
     }

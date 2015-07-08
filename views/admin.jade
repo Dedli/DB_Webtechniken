@@ -26,6 +26,8 @@ block content
             td Nuterkennzeichen
             td Matrikelnummer
             td bearbeiten
+            td Gremienmitgliedschaft hinzuf&uuml;gen
+            td Fachschaftmitgliedschaft hinzuf&uuml;gen
     tbody
     each object in grm_members
         tr
@@ -37,6 +39,12 @@ block content
             td
                     a(href='/edit_grm_user/'+object._id)
                         span.glyphicon.glyphicon-edit
+            td
+                    a(href='/add_membership/'+object._id)
+                        span.glyphicon.glyphicon-plus
+            td
+                a(href='/add_membership_council/'+object._id)
+                    span.glyphicon.glyphicon-plus
   hr
   h2 Gremien
   a(href='/create_committee') Gremium erstellen

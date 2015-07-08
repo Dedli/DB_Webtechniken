@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Module dependencies.
+ * Modulabhängigkeiten
  */
 
 var app = require('../app');
@@ -9,20 +9,20 @@ var debug = require('debug')('DB_Webtechniken:server');
 var http = require('http');
 
 /**
- * Get port from environment and store in Express.
+ * Port von Enviroment speichern
  */
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Erstellen des HTTP Servers
  */
 
 var server = http.createServer(app);
 
 /**
- * Listen on provided port, on all network interfaces.
+ * Auf Port "lauschen"
  */
 
 server.listen(port);
@@ -30,7 +30,7 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 /**
- * Normalize a port into a number, string, or false.
+ * Normalisieren des Ports
  */
 
 function normalizePort(val) {
@@ -50,7 +50,7 @@ function normalizePort(val) {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Event listener für HTTP Error Event
  */
 
 function onError(error) {
@@ -78,7 +78,7 @@ function onError(error) {
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Event listener für HTTP Events (kein Error)
  */
 
 function onListening() {

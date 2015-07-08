@@ -2,7 +2,7 @@
  * Created by daniel on 13.06.2015.
  */
 var mongoose = require('mongoose');
-
+//Model für Gremienmitgliedschaft
 module.exports = mongoose.model('Membership',{
     id: String,
     grem_id: String,

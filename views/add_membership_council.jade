@@ -1,0 +1,23 @@
+//
+   Created by daniel on 08.07.2015
+
+extends layout
+block content
+    h2 Mitgliedschaft hinzuf&uuml;gen
+    form(action='/add_membership/'+user_id,method='post')
+
+        label(for='from')
+            b &nbsp;von:&nbsp;
+                input(type='date',value='',placeholder='Von: ',name='from')
+        br
+        label(for='to')
+            b &nbsp;bis:&nbsp;
+                input(type='date',value='',placeholder='Von: ',name='to')
+        br
+        label(for='council_id')
+            b Fachschaft:&nbsp
+                select(name='council_id')
+                    <option value="" style="display:none;"></option>
+                    each cou, index in councils
+                        <option value="#{cou._id}">#{cou._name}</option>
+        button(type="submit") Abschicken

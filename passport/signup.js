@@ -1,9 +1,11 @@
+
+//Modulabhängigkeiten
 var LocalStrategy   = require('passport-local').Strategy;
 var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
 
 module.exports = function(passport){
-
+    //Registrierungsstrategie von Passport
     passport.use('signup', new LocalStrategy({
                 passReqToCallback : true // allows us to pass back the entire request to the callback
             },

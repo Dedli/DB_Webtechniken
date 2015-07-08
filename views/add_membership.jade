@@ -1,0 +1,44 @@
+//
+   Created by daniel on 08.07.2015
+
+extends layout
+block content
+    h2 Mitgliedschaft hinzuf&uuml;gen
+    form(action='/add_membership/'+user_id,method='post')
+        label(for='name')
+            b Gremium:&nbsp
+                select(name='committee')
+                    <option value="" style="display:none;"></option>
+                    each comm, index in committees
+                        <option value="#{comm._id}">#{comm._name}</option>
+        br
+        label(for='from')
+            b &nbsp;von:&nbsp;
+                input(type='date',value='',placeholder='Von: ',name='from')
+        br
+        label(for='successor')
+            b &nbsp;Nachrücker&nbsp;
+                input(type='checkbox',name='successor',value="true")
+        br
+        label(for='to')
+            b &nbsp;bis:&nbsp;
+                input(type='date',value='',placeholder='Von: ',name='to')
+        br
+        label(for='reason')
+            b &nbsp;von:&nbsp;
+                input(type='text',value='',placeholder='Grund: Ein/Austritt ',name='reason')
+        br
+        label(for='period_id')
+            b Amtsperiode:&nbsp
+                select(name='period_id')
+                    <option value="" style="display:none;"></option>
+                    each per, index in periods
+                        <option value="#{per._id}">#{moment(per.from).format("DD.MM.YYYY")} - #{moment(per.to).format("DD.MM.YYYY")} </option>
+        br
+        label(for='council_id')
+            b Fachschaft:&nbsp
+                select(name='council_id')
+                    <option value="" style="display:none;"></option>
+                    each cou, index in councils
+                        <option value="#{cou._id}">#{cou._name}</option>
+        button(type="submit") Abschicken
