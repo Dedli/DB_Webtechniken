@@ -12,13 +12,14 @@ block content
                     each comm, index in committees
                         <option value="#{comm._id}">#{comm._name}</option>
         br
-        label(for='from')
-            b &nbsp;von:&nbsp;
-                input(type='date',value='',placeholder='Von: ',name='from')
-        br
-        label(for='successor')
-            b &nbsp;Nachrücker&nbsp;
-                input(type='checkbox',name='successor',value="true")
+        div
+            label(for='from')
+                b &nbsp;von:&nbsp;
+                    input(type='date',value='',placeholder='Von: ',name='from',onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
+            br
+            label(for='successor')
+                b &nbsp;Nachrücker&nbsp;
+                    input(type='checkbox',name='successor',value="true",onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
         br
         label(for='to')
             b &nbsp;bis:&nbsp;

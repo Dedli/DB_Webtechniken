@@ -7,5 +7,19 @@ html
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js')
     link(rel='stylesheet', href='/stylesheets/style.css')
 
+
+    script(type='text/javascript').
+        {
+            function validateTimeframe(obj){
+                var from = obj.getElementsByTagName("input")[0].value;
+                var to = obj.getElementsByTagName("input")[1].value;
+                if(to!=""){
+                    obj.getElementsByTagName("input")[0].setAttribute("max",to);
+                }
+                if(from!=""){
+                    obj.getElementsByTagName("input")[1].setAttribute("min",from);
+                }
+            }
+        }
   body
     block content

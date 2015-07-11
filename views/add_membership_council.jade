@@ -8,11 +8,11 @@ block content
 
         label(for='from')
             b &nbsp;von:&nbsp;
-                input(type='date',value='',placeholder='Von: ',name='from')
+                input(type='date',value='',placeholder='Von: ',name='from',onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
         br
         label(for='to')
             b &nbsp;bis:&nbsp;
-                input(type='date',value='',placeholder='Von: ',name='to')
+                input(type='date',value='',placeholder='Von: ',name='to',onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
         br
         label(for='council_id')
             b Fachschaft:&nbsp

@@ -2,9 +2,6 @@
    Created by daniel on 14.06.2015.
 include layout
 block content
-    h3=user
-    h3=memberships
-    h3=councils
     h1 Nuter &auml;ndern
 
     form(action='/edit_grm_user/'+user._id,method='post')
@@ -39,15 +36,16 @@ block content
                                     <option value="#{fachschaft._id}" selected>#{fachschaft._name}</option>
                                 else
                                     <option value="#{fachschaft._id}">#{fachschaft._name}</option>
-                label(for='councils['+index+'][from]')
-                    b &nbsp;von:&nbsp;
-                        input(type='date',value=moment(council.from).format("YYYY-MM-DD"),placeholder='Von: ',name='councils['+index+'][from]')
-                label(for='councils['+index+'][to]')
-                    b &nbsp;bis:&nbsp;
-                        input(type='date',value=moment(council.to).format("YYYY-MM-DD"),placeholder='Bis: ',name='councils['+index+'][to]')
-                        input(type='hidden',value=user._id,name='councils['+index+'][user_id]')
-                        input(type='hidden',value=council._id,name='councils['+index+'][_id]')
-                        button(style='display: none',type='button',onclick='deleteCouncil(this.parentNode.parentNode.parentNode)') &#045;
+                div
+                    label(for='councils['+index+'][from]')
+                        b &nbsp;von:&nbsp;
+                            input(type='date',value=moment(council.from).format("YYYY-MM-DD"),placeholder='Von: ',name='councils['+index+'][from]',onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
+                    label(for='councils['+index+'][to]')
+                        b &nbsp;bis:&nbsp;
+                            input(type='date',value=moment(council.to).format("YYYY-MM-DD"),placeholder='Bis: ',name='councils['+index+'][to]',onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
+                            input(type='hidden',value=user._id,name='councils['+index+'][user_id]')
+                            input(type='hidden',value=council._id,name='councils['+index+'][_id]')
+                            button(style='display: none',type='button',onclick='deleteCouncil(this.parentNode.parentNode.parentNode.parentNode)') &#045;
         each membership,index in memberships
             div
                 label(for='comm['+index+'][committee]')

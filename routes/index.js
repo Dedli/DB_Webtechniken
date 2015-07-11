@@ -191,13 +191,17 @@ module.exports = function(passport){
             //Finden des Users, anhand der ID aus der URL
             grm_user_model.findById(user_id, function (err, usr) {
                 if (err) {
+                    console.error(err.message);
                     res.status(err.status || 500);
                     res.render('error', {
                         message: err.message,
                         error: err
                     });
                 }
-                else if (!usr) res.status(404).send("Nutzer nicht gefunden");
+                else if (!usr) {
+                    console.error("User not found");
+                    res.status(404).send("Nutzer nicht gefunden");
+                }
                 else {
                     console.log("speicher geänderte Userdaten");
                     console.log(user);
@@ -209,6 +213,7 @@ module.exports = function(passport){
                     //schreiben der Änderungen in die DB
                     usr.save(function (err) {
                         if (err) {
+                            console.error(err.message);
                             res.status(err.status || 500);
                             res.render('error', {
                                 message: err.message,
@@ -219,10 +224,15 @@ module.exports = function(passport){
                     // Jede Fachschaftsmitgliedschaft des users bearbeiten
                     for (var cou in user.councils) {
                         cou_id = user.councils[cou]._id;
+                        if(validator.isNull(cou_id)){
+                            res.status(400).send("Wrong student council")
+                            break;
+                        }
                         console.log("Bearbeite Fachschaft: " + JSON.stringify(cou_id));
                         // finden der mitgliedschaft councils[cou]
                         membership_council_model.findOne({_id: cou_id}, function (err, council) {
                             if (err) {
+                                console.error(err.message);
                                 res.status(err.status || 500);
                                 res.render('error', {
                                     message: err.message,
@@ -230,10 +240,16 @@ module.exports = function(passport){
                                 });
                             }
                             else if (!council) {
+                                console.error("Council Membership not found");
                                 res.status(404);
                                 res.send('Council Membership not found');
                             }
                             else {
+
+                                if(validator.isAfter(user.councils[cou].from,user.councils[cou].to)){
+                                    res.status(400).send("no valid student council Timeframe");
+                                }
+
                                 //schreiben der neuen wert in die gefundene Fachschaftsmitgliedschaft
                                 council.council_id = user.councils[cou].council_id || council.council_id;
                                 council.from = user.councils[cou].from || council.from;
@@ -243,6 +259,7 @@ module.exports = function(passport){
                                 //speichern der geänderten Fachschaftsmitgliedschaft
                                 council.save(function (err) {
                                     if (err) {
+                                        console.error(err.message);
                                         res.status(500);
                                         res.render('error', {
                                             message: err.message,
@@ -251,14 +268,18 @@ module.exports = function(passport){
                                     }
 
                                 });
-
+                            }
+                        });
+                    }
                                 //Alle Gremienmitgliedschaften des Users bearbeiten
                                 for (var membership in user.comm) {
                                     var membership_id = user.comm[membership].membership_id;
-                                    console.log("gefundene membership_id" + membership_id);
+                                    if(validator.isNull(membership_id)) {res.status(400).send("Wrong Membership");
+                                        break;}
                                     //Abrufen der aktuellen Gremienmitgliedschaft aus DB, anhand der ID
                                         membership_model.findOne({_id: membership_id}, function (err, comm) {
                                             if (err) {
+                                                console.error(err.message);
                                                 res.status(err.status || 500);
                                                 res.render('error', {
                                                     message: err.message,
@@ -266,26 +287,32 @@ module.exports = function(passport){
                                                 });
                                             }
                                             else if (!comm) {
+                                                console.error("Committee Membership not found");
                                                 res.send('Committee not found');
                                             }
                                             else {
 
                                                         var succ = user.comm[membership].successor;
                                                         if (!succ) succ = false;
+
+                                                        if(validator.isAfter(user.comm[membership].from,user.comm[membership].to)){
+                                                            res.status(400).send("no valid committee timeframe");
+                                                        }
+
                                                         //Gremiummitgliedschaft durch geänderte Werte ergänzen
                                                         comm.grem_id = user.comm[membership].committee || comm.grem_id;
                                                         comm.from = user.comm[membership].from || comm.from;
                                                         comm.to = user.comm[membership].to || comm.to;
-                                                        comm.reason = user.comm[membership].reason;
+                                                        comm.reason = user.comm[membership].reason || comm.reason;
                                                         comm.successor = succ;
-                                                        comm.council_id = user.comm[membership].council_id;
-                                                        comm.period_id = user.comm[membership].period_id;
+                                                        comm.council_id = user.comm[membership].council_id || comm.council_id;
+                                                        comm.period_id = user.comm[membership].period_id || comm.period_id;
 
                                                         console.log('Save Membership: ' + comm);
                                                         //Abspeichern der Gremienmitgliedschaft
                                                         comm.save(function (err) {
                                                             if (err) {
-
+                                                                console.error(err.message);
                                                                 res.render('error', {
                                                                     message: err.message,
                                                                     error: err
@@ -293,21 +320,19 @@ module.exports = function(passport){
                                                             }
 
                                                         });
-                                                        res.render('success', {msg: "Nutzer erfolgreich ge&auml;ndert "});
+
                                             }
 
                                         });
 
                                 }
+                                //Rendern der Erfolgsmeldung erst nachdem alle Gremienmitglieschaften und Fachschaftsmitgliedschaften abgearbeitet wurden
+                                res.render('success', {msg: "Nutzer erfolgreich ge\u00e4ndert "});
                             }
                         })
 
 
                     }
-                }
-
-            });
-        }
     });
     //Handle Membership_add GET Request
     router.get('/add_membership/:user_id',isAuthenticated, function(req,res){
@@ -382,7 +407,7 @@ module.exports = function(passport){
                 }
                 else
                 //Form-Post-Redirect zur /admin Page mit vorheriger Erfolgsmeldung
-                res.render('success', {msg: "Mitgliedschaft erfolgreich hinzugefuegt"});
+                res.render('success', {msg: "Mitgliedschaft erfolgreich hinzugef\u00fcgt"});
             });
         }
     });
@@ -431,7 +456,7 @@ module.exports = function(passport){
                 }
                 else
                 //Form-Post-Redirect bei erfolgreichem Hinzufügen der Fachschaftsmitgliedschaft mit vorheriger Ausgabe einer Erfolgsmeldung
-                    res.render('success', {msg: "Mitgliedschaft erfolgreich hinzugefuegt"});
+                    res.render('success', {msg: "Mitgliedschaft erfolgreich hinzugef\u00fcgt"});
             });
         }
     });
@@ -454,6 +479,11 @@ module.exports = function(passport){
           for (var grem in req.body.comm) {
               //console.log("ID beim Post: "+user._id);
 
+              if(validator.isAfter(req.body.comm[grem].from,req.body.comm[grem].to))
+              {
+                  res.status(400).send("Bad committee membership timeframe");
+                  break;
+              }
               var membership = new membership_model({
                   grem_id: req.body.comm[grem].committee,
                   from: req.body.comm[grem].from,
@@ -465,7 +495,7 @@ module.exports = function(passport){
                   successor: req.body.comm[grem].successor || false
 
               });
-              membership.save(function (err, user) {
+              membership.save(function (err) {
                   if (err) {
                       res.status(err.status || 500);
                       res.render('error', {
@@ -483,6 +513,12 @@ module.exports = function(passport){
           for (var council in req.body.councils) {
               //console.log("ID beim Post: "+user._id);
                 //Anlegen einer neuen Fachschaftsmitgliedschaft
+
+              if(validator.isAfter(req.body.councils[council].from,req.body.councils[council].to))
+              {
+                  res.status(400).send("Bad council membership timeframe");
+                  break;
+              }
               var council_membership = new membership_council_model({
                   from: req.body.councils[council].from,
                   to: req.body.councils[council].to,
@@ -759,10 +795,10 @@ module.exports = function(passport){
                           error: err
                       });
                   }
-                  else if (!grm_user_models) res.status(404).send('Keine User in Datenbank');
+                  else if (!grm_users) res.status(404).send('Keine User in Datenbank');
                   else {
-                      //console.log("DATA:");console.log(grm_user_models);
-                      JSON.stringify(grm_user_models);
+                      //console.log("DATA:");console.log(grm_users);
+                      JSON.stringify(grm_users);
                       //finden aller Mitgliedschaften
                       committee_model.find().lean().exec(function (err, committees) {
                           if (err) {

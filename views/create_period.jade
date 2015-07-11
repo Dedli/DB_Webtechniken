@@ -1,17 +1,17 @@
 //
    Created by daniel on 21.06.2015.
-
-block create_period
+extends layout
+block content
     form(action='/create_period',method='post')
         div
             h3 Amtsperiode erstellen!
         div
             label(for='from')
                 b Von:&nbsp
-                    input(type='date',value='',placeholder='Namen hier eintragen',name='from', required)
+                    input(type='date',value='',placeholder='Namen hier eintragen',name='from', required,onchange="validateTimeframe(this.parentNode.parentNode.parentNode.parentNode)")
         div
             label(for='to')
                 b Bis:&nbsp
-                    input(type='date',value='',placeholder='Namen hier eintragen',name='to', required)
+                    input(type='date',value='',placeholder='Namen hier eintragen',name='to', required,onchange="validateTimeframe(this.parentNode.parentNode.parentNode.parentNode)")
         div
             button(type='submit',id='submitCreateStudentCouncil') Amtsperiode anlegen
