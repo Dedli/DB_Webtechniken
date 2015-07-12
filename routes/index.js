@@ -81,6 +81,40 @@ module.exports = function(passport){
         })(req, res, next)
     });
 
+    router.get('/create_multiple_user',isAuthenticated,function(req,res){
+        if(!req.user.admin) {res.redirect('/');res.flush('Keine Berechtigung');}
+        else {
+            res.render('create_multiple_user');
+        }
+    });
+
+    router.post('/create_multiple_user',isAuthenticated,function(req,res){
+        if(!req.user.admin) {res.redirect('/');res.flush('Keine Berechtigung');}
+        else {
+            console.log("Got multiple User: ");console.log(req.body);
+            req.body.user.forEach(function (i){
+                var user = new grm_user_model({
+                    firstname: i.firstname,
+                    lastname: i.lastname,
+                    nkz: i.nkz,
+                    matr_nr: i.matr_nr
+                });
+                console.log('\nsave user: ');
+                console.log(user);
+                user.save(function (err) {
+                    if (err) {
+                        res.status(err.status || 500);
+                        res.render('error', {
+                            message: err.message,
+                            error: err
+                        });
+                    }
+                });
+            });
+            res.render('success',{msg: "Nutzer erfolgreich hinzugef\u00fcgt"})
+        }
+    });
+
     /*Get Member Edit*/
     router.get('/edit_grm_user/:user_id',isAuthenticated, function(req,res){
         if(!req.user.admin) {res.redirect('/');res.flush('Keine Berechtigung');}
@@ -122,7 +156,7 @@ module.exports = function(passport){
                 else {
                     //Konsolenausgabe der gefundenen Ergebnisse
                     JSON.stringify(memberships);
-                    console.log("Membership from DB " + JSON.stringify(memberships));
+                    console.log("Membership from DB ");console.log(memberships);
                     JSON.stringify(member);
                     //Alle Gremien aus der DB anfordern
                     committee_model.find().lean().exec(function (err, committees) {
@@ -222,11 +256,10 @@ module.exports = function(passport){
                         }
                     });
                     // Jede Fachschaftsmitgliedschaft des users bearbeiten
-                    for (var cou in user.councils) {
-                        cou_id = user.councils[cou]._id;
+                    req.body.councils.forEach(function(cou) {
+                        cou_id = cou._id;
                         if(validator.isNull(cou_id)){
                             res.status(400).send("Wrong student council")
-                            break;
                         }
                         console.log("Bearbeite Fachschaft: " + JSON.stringify(cou_id));
                         // finden der mitgliedschaft councils[cou]
@@ -246,15 +279,15 @@ module.exports = function(passport){
                             }
                             else {
 
-                                if(validator.isAfter(user.councils[cou].from,user.councils[cou].to)){
+                                if(validator.isAfter(cou.from,cou.to)){
                                     res.status(400).send("no valid student council Timeframe");
                                 }
 
                                 //schreiben der neuen wert in die gefundene Fachschaftsmitgliedschaft
-                                council.council_id = user.councils[cou].council_id || council.council_id;
-                                council.from = user.councils[cou].from || council.from;
-                                council.to = user.councils[cou].to || council.to;
-                                council.user_id = user.councils[cou].user_id || council.user_id;
+                                council.council_id = cou.council_id || council.council_id;
+                                council.from = cou.from || council.from;
+                                council.to = cou.to || council.to;
+                                council.user_id = cou.user_id || council.user_id;
                                 console.log("Save council Membership: " + council);
                                 //speichern der geänderten Fachschaftsmitgliedschaft
                                 council.save(function (err) {
@@ -270,12 +303,13 @@ module.exports = function(passport){
                                 });
                             }
                         });
-                    }
+                    });
                                 //Alle Gremienmitgliedschaften des Users bearbeiten
-                                for (var membership in user.comm) {
-                                    var membership_id = user.comm[membership].membership_id;
+                                req.body.comm.forEach(function(membership) {
+                                    console.log("aus forEach: ");console.log(membership);
+                                    var membership_id = membership.membership_id;
                                     if(validator.isNull(membership_id)) {res.status(400).send("Wrong Membership");
-                                        break;}
+                                        }
                                     //Abrufen der aktuellen Gremienmitgliedschaft aus DB, anhand der ID
                                         membership_model.findOne({_id: membership_id}, function (err, comm) {
                                             if (err) {
@@ -292,21 +326,21 @@ module.exports = function(passport){
                                             }
                                             else {
 
-                                                        var succ = user.comm[membership].successor;
+                                                        var succ = membership.successor;
                                                         if (!succ) succ = false;
 
-                                                        if(validator.isAfter(user.comm[membership].from,user.comm[membership].to)){
+                                                        if(validator.isAfter(membership.from,membership.to)){
                                                             res.status(400).send("no valid committee timeframe");
                                                         }
 
                                                         //Gremiummitgliedschaft durch geänderte Werte ergänzen
-                                                        comm.grem_id = user.comm[membership].committee || comm.grem_id;
-                                                        comm.from = user.comm[membership].from || comm.from;
-                                                        comm.to = user.comm[membership].to || comm.to;
-                                                        comm.reason = user.comm[membership].reason || comm.reason;
-                                                        comm.successor = succ;
-                                                        comm.council_id = user.comm[membership].council_id || comm.council_id;
-                                                        comm.period_id = user.comm[membership].period_id || comm.period_id;
+                                                        comm.grem_id = membership.committee || comm.grem_id;
+                                                        comm.from = membership.from || comm.from;
+                                                        comm.to = membership.to || comm.to;
+                                                        comm.reason = membership.reason || comm.reason;
+                                                        comm.successor = succ || comm.successor;
+                                                        comm.council_id = membership.council_id || comm.council_id ;
+                                                        comm.period_id = membership.period_id  || comm.period_id;
 
                                                         console.log('Save Membership: ' + comm);
                                                         //Abspeichern der Gremienmitgliedschaft
@@ -325,7 +359,7 @@ module.exports = function(passport){
 
                                         });
 
-                                }
+                                });
                                 //Rendern der Erfolgsmeldung erst nachdem alle Gremienmitglieschaften und Fachschaftsmitgliedschaften abgearbeitet wurden
                                 res.render('success', {msg: "Nutzer erfolgreich ge\u00e4ndert "});
                             }
@@ -476,23 +510,22 @@ module.exports = function(passport){
           });
           console.log('\nsave user: ');
           console.log(user);
-          for (var grem in req.body.comm) {
+          req.body.comm.forEach(function (grem){
               //console.log("ID beim Post: "+user._id);
 
-              if(validator.isAfter(req.body.comm[grem].from,req.body.comm[grem].to))
+              if(validator.isAfter(grem.from,grem.to))
               {
                   res.status(400).send("Bad committee membership timeframe");
-                  break;
               }
               var membership = new membership_model({
-                  grem_id: req.body.comm[grem].committee,
-                  from: req.body.comm[grem].from,
-                  to: req.body.comm[grem].to,
-                  reason: req.body.comm[grem].reason,
+                  grem_id: grem.committee,
+                  from: grem.from,
+                  to: grem.to,
+                  reason: grem.reason,
                   user_id: user._id,
-                  council_id: req.body.comm[grem].council_id,
-                  period_id: req.body.comm[grem].period_id,
-                  successor: req.body.comm[grem].successor || false
+                  council_id: grem.council_id,
+                  period_id: grem.period_id,
+                  successor: grem.successor || false
 
               });
               membership.save(function (err) {
@@ -508,22 +541,21 @@ module.exports = function(passport){
 
               console.log('\nsave membership: ');
               console.log(membership);
-          }
+          });
           //Iteration über alle Fachschaftsmitgliedschaften
-          for (var council in req.body.councils) {
+          req.body.councils.forEach(function (council) {
               //console.log("ID beim Post: "+user._id);
                 //Anlegen einer neuen Fachschaftsmitgliedschaft
 
-              if(validator.isAfter(req.body.councils[council].from,req.body.councils[council].to))
+              if(validator.isAfter(council.from,council.to))
               {
                   res.status(400).send("Bad council membership timeframe");
-                  break;
               }
               var council_membership = new membership_council_model({
-                  from: req.body.councils[council].from,
-                  to: req.body.councils[council].to,
+                  from: council.from,
+                  to: council.to,
                   user_id: user._id,
-                  council_id: req.body.councils[council].council_id
+                  council_id: council.council_id
               });
               //Abspeichern der Fachschaftsmitgliedschaft
               council_membership.save(function (err) {
@@ -538,8 +570,8 @@ module.exports = function(passport){
 
                 //Konsolenausgabe
               console.log('\nsave Council_membership: ');
-              console.log(council);
-          }
+              console.log(council_membership);
+          });
 
           //Abspeichern des angelegeten Users
           user.save(function (err) {

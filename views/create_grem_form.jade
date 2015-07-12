@@ -1,6 +1,9 @@
 //
    Created by daniel on 13.06.2015.
+//Formulardaten zum Erstellen einer Gremienmitglieschaft
+    Nur als include verwendbar, da kein HTML für komplettes Formular vorhanden ist.
 script(type='text/javascript').
+    //Javascriptfunktionen zum klonen und Löschen der Formular inputs und selects
     var array = 0;
     function cloneGrm(){
         array ++;
@@ -27,13 +30,14 @@ div
         label(for='comm[0][committee]')
             b Gremienmitgliedschaft:&nbsp
                 select(value='', placeholder='Gremium ausw\u00e4hlen', name='comm[0][committee]')
-                    <option value="" style="display:none;"></option>
+                    //Iteration über alle Gremien
                     each gremium, index in committees
                         <option value="#{gremium._id}">#{gremium._name}</option>
             br
             label(for='comm[0][period_id]')
                 b Amtsperiode:&nbsp
                     select(name='comm[0][period_id]')
+                        //Iteration über alle Amtszeiten
                         each period in periods
                                 <option value="#{period._id}">#{moment(period.from).format("DD.MM.YYYY")} - #{moment(period.to).format("DD.MM.YYYY")}</option>
             br
@@ -44,6 +48,7 @@ div
                 label(for='comm[0][to]')
                     b &nbsp;bis:&nbsp;
                         input(type='date',value='',placeholder='Bis: ',name='comm[0][to]',onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
+                        //Button zum löschen eines geklonten Inhalts (nicht sichtbar, bei nicht geklonten Inhalt)
                         button(style='display: none',type='button',id='DelFS',onclick='deleteGrm(this.parentNode.parentNode.parentNode.parentNode.parentNode)') &#045;
 
             input(style='width: 100%' type='text',placeholder='Grund Austritt/Eintritt ',name='comm[0][reason]')
@@ -52,14 +57,15 @@ div
             label(for='FS')
                 b Fachschaftsmitgliedschaft:&nbsp
                     select(value='', placeholder='Fachschaft ausw\u00e4hlen', name='comm[0][council_id]')
-                        <option value="" style="display:none;"></option>
+                        //Iteration über alle Fachschaften
                         each fachschaft in student_council
                             <option value="#{fachschaft._id}">#{fachschaft._name}</option>
             br
             label(for='successor')
                 b Nachr&uuml;cker:&nbsp;
                     input( type="checkbox" name="comm[0][successor]" value="true")
+    //Hier werden die geklonten Inhalte eingefügt
     div#insertGrm
-    div#cloneGrm
+
         button(type='button',id='CloneGrmbutton',onclick="cloneGrm()",title='hinzufuegen') &#043;
         br

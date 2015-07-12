@@ -2,6 +2,7 @@
    Created by daniel on 04.07.2015.
 extends layout
 block content
+    //Javascript Funktionen zum klonen und löschen des Geklonten
     script(type='text/javascript').
         var array = 0;
         function clone() {
@@ -26,7 +27,7 @@ block content
                 label(for='FS')
                     b Fachschaftsmitgliedschaft:&nbsp
                         select(value='', placeholder='Fachschaft ausw\u00e4hlen', name='councils[0][council_id]' required)
-                            <option value="" style="display:none;"></option>
+                            //iteration über alle Fachschaften
                             each cou in student_council
                                 <option value="#{cou._id}">#{cou._name}</option>
                 div

@@ -1,5 +1,6 @@
 //
    Created by daniel on 14.06.2015.
+    Editieren eines Mitglieds und seiner Mitgliedschaften
 include layout
 block content
     h1 Nuter &auml;ndern
@@ -26,6 +27,7 @@ block content
                 b Nutzerkennzeichen:&nbsp
                     input(id='nkz',type='text',value=user.nkz,placeholder='Nutzerkennzeichen',name='nkz', required)
         div
+            //Iteration über alle Fachschaften. Es werden für jede Fachschaft Formularfelder erzeugt und die Wert hineingeschrieben, welche aus der DB kommen
         each council,index in councils
             div
                 label(for='councils['+index+'][council_id]')
@@ -46,6 +48,7 @@ block content
                             input(type='hidden',value=user._id,name='councils['+index+'][user_id]')
                             input(type='hidden',value=council._id,name='councils['+index+'][_id]')
                             button(style='display: none',type='button',onclick='deleteCouncil(this.parentNode.parentNode.parentNode.parentNode)') &#045;
+        //Iteration über alle Griemen. Es werden für jedes Gremium Formularfelder erzeugt und die Wert hineingeschrieben, welche aus der DB kommen
         each membership,index in memberships
             div
                 label(for='comm['+index+'][committee]')

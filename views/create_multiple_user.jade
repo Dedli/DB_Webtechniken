@@ -1,0 +1,60 @@
+//
+   Created by daniel on 12.07.2015.
+
+extends layout
+block content
+    //Javascript Funktionen zum Clonen und Löschen des geclonten Inhalts
+    script(type='text/javascript').
+        var array = 0;
+        var user = array+1;
+        function clone() {
+            array++;
+            user++;
+            var clone = document.getElementById('clone').cloneNode(true);
+            clone.getElementsByTagName("button")[0].removeAttribute("style");
+            clone.getElementsByTagName("h3")[0].innerHTML = 'Nutzer '+user;
+            clone.getElementsByTagName("input")[0].setAttribute("name", "user[" + array + "][firstname]");
+            clone.getElementsByTagName("input")[1].setAttribute("name", "user[" + array + "][lastname]");
+            clone.getElementsByTagName("input")[2].setAttribute("name", "user[" + array + "][matr_nr]");
+            clone.getElementsByTagName("input")[3].setAttribute("name", "user[" + array + "][nkz]");
+            clone.getElementsByTagName("input")[0].value = "";
+            clone.getElementsByTagName("input")[1].value = "";
+            clone.getElementsByTagName("input")[2].value = "";
+            clone.getElementsByTagName("input")[3].value = "";
+
+            document.getElementById('insert').appendChild(clone);
+        }
+        function deletethis(child) {
+            var node = document.getElementById("insert");
+            node.removeChild(child);
+            array--;
+            user--;
+        }
+        //Formular für die Nutzereingabe eines Mitglieds
+    form(action='/create_multiple_user',method='post')
+        div#clone
+            div
+                h3 Nutzer 1
+            div
+                label(for='firstname')
+                    b Vorname:&nbsp
+                        input(type='text',placeholder='Vornamen hier eintragen',name='user[0][firstname]', required)
+            div
+                label(for='lastname')
+                    b Nachname:&nbsp
+                        input(type='text',placeholder='Nachnamen hier eintragen',name='user[0][lastname]', required)
+            div
+                label(for='matrikelnummer')
+                    b Matrikelnummer (optional):&nbsp
+                        input(type='number',placeholder='Matrikelnummer',name='user[0][matr_nr]',min=100000,max=999999)
+            div
+                label(for='nkz')
+                    b Nutzerkennzeichen:&nbsp
+                        input(type='text',placeholder='Nutzerkennzeichen',name='user[0][nkz]', required)
+                        button(style='display: none',onclick='deletethis(this.parentNode.parentNode.parentNode.parentNode)') Nutzer entfernen
+        //Hier wird das Formular reingeklont
+        div#insert
+        //Nutzer hinzufügen -> form klonen
+        button(type='button',onclick='clone()') Nutzer hinzuf&uuml;gen
+
+        button(type='submit') Abschicken

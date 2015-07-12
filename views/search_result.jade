@@ -1,13 +1,15 @@
 //
    Created by daniel on 04.07.2015.
-
+    Suchergebnisse darstellen
 extends layout
 
 block content
     h1 Suchergebnisse
+    a(href='/search') Zur&uuml;ck zum Suchinterface
     - var n = 0
     each usr,i in users
         each mem,k in memberships
+            //Wenn mitgliedschaft dem User gehört und ncoh kein Ergebnis abgedruckt wurde, wird diese Mitglidschaft zusammen mit den Nutzerdaten abgedruckt, ansonsten nur die Mitgliedschaft.
             if (mem.user_id == usr._id)
                 if(n==0)
                       h3 Ergebnis #{i+1}:
@@ -50,3 +52,4 @@ block content
                           if(mem.period_id == per._id)
                               p Periode: #{moment(per.from).format("DD.MM.YYYY")} - #{moment(per.to).format("DD.MM.YYYY")}
         - n = 0
+    a(href='/search') Zur&uuml;ck zum Suchinterface

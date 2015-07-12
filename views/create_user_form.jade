@@ -1,14 +1,16 @@
+// Formularteile zum erstellen eines Nutzers
+    muss per include genutzt werden, da kein vollständiges HTML Formular vorhanden ist.
 block create_user_form
             div
                 h3 Nutzerdaten
             div
                 label(for='name')
                     b Name:&nbsp
-                        input(id='name',type='text',value='',placeholder='Namen hier eintragen',name='firstname', required)
+                        input(id='name',type='text',value='',placeholder='Vornamen hier eintragen',name='firstname', required)
             div
                 label(for='vorname')
                     b Vorname:&nbsp
-                        input(id='vorname',type='text',value='',placeholder='Vornamen hier eintragen',name='lastname', required)
+                        input(id='vorname',type='text',value='',placeholder='Nachnamen hier eintragen',name='lastname', required)
             div
                 label(for='matrikelnummer')
                     b Matrikelnummer (optional):&nbsp

@@ -1,5 +1,6 @@
 //
    Created by daniel on 08.07.2015
+// Hinzufügen einer einzelnen Mitgliedschaft
 
 extends layout
 block content
@@ -8,7 +9,7 @@ block content
         label(for='name')
             b Gremium:&nbsp
                 select(name='committee')
-                    <option value="" style="display:none;"></option>
+                    //Alle Gremien in select eintragen
                     each comm, index in committees
                         <option value="#{comm._id}">#{comm._name}</option>
         br
@@ -18,7 +19,7 @@ block content
                     input(type='date',value='',placeholder='Von: ',name='from',onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
             br
             label(for='successor')
-                b &nbsp;Nachrücker&nbsp;
+                b &nbsp;Nachr&uuml;cker&nbsp;
                     input(type='checkbox',name='successor',value="true",onchange="validateTimeframe(this.parentNode.parentNode.parentNode)")
         br
         label(for='to')
@@ -32,14 +33,14 @@ block content
         label(for='period_id')
             b Amtsperiode:&nbsp
                 select(name='period_id')
-                    <option value="" style="display:none;"></option>
+                    //Alle Amtsperioden in select eintragen
                     each per, index in periods
                         <option value="#{per._id}">#{moment(per.from).format("DD.MM.YYYY")} - #{moment(per.to).format("DD.MM.YYYY")} </option>
         br
         label(for='council_id')
             b Fachschaft:&nbsp
                 select(name='council_id')
-                    <option value="" style="display:none;"></option>
+                    //alle Fachschaften in select eintragen
                     each cou, index in councils
                         <option value="#{cou._id}">#{cou._name}</option>
         button(type="submit") Abschicken

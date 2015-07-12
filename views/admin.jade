@@ -6,6 +6,7 @@ block content
   p #{message}
   h1 Admininterface
     hr
+  //Interface um Nutzer anzulegen
   div
         h2 Nutzer Anlegen
         form(action='/create_grem_user',method='post')
@@ -15,7 +16,10 @@ block content
 
             div
                button(type='submit',id='submitCreateUser') Nutzer anlegen
+  h2 Mehrere Nutzer anlegen (ohne Mitgliedschaften)
+  a(href='/create_multiple_user') Zum Formular
   hr
+  //Tabelle erstellen um Nutzerdaten und links zum Bearbeiten bzw. Hinzufügen von Gremienmitgliedschaften und Fachschaftsmitgliedschaften einfügen
   h2 Nutzer &auml;ndern
   table(border= '1px')
     thead
@@ -29,6 +33,7 @@ block content
             td Gremienmitgliedschaft hinzuf&uuml;gen
             td Fachschaftmitgliedschaft hinzuf&uuml;gen
     tbody
+    //Iteration über alle Mitglieder
     each object in grm_members
         tr
             td.hidden=object._id
@@ -48,6 +53,7 @@ block content
   hr
   h2 Gremien
   a(href='/create_committee') Gremium erstellen
+  //Tabelle mit allen Gremien welche direkt von dort aus bearbeitet werden können
   table(border= '1px')
       thead
           tr
@@ -56,6 +62,7 @@ block content
             td Beschreibung
             td bearbeiten
       tdbody
+      //Iteration über alle Gremien
       each comm,index in committees
           tr
             form(action='/edit_committee/'+comm._id, method='post', name='edit_committee'+index)
@@ -71,6 +78,7 @@ block content
   hr
   h2 Fachschaften
   a(href='/create_student_council') Fachschaft erstellen
+  //Tabelle mit allen Fachschaften erzeugen die von dort auch aus bearbeitet werden können
   table(border= '1px')
         thead
             tr
@@ -78,6 +86,7 @@ block content
                 td Namen
                 td bearbeiten
         tdbody
+        //Iteration über alle Fachschaften
         each council,index in student_council
             tr
                 form(action='/edit_student_council/'+council._id, method='post', name='edit_student_council'+index)
@@ -91,6 +100,7 @@ block content
   hr
   h2 Amtsperioden
   a(href='/create_period') Amtsperiode erstellen
+  //Tabelle mit allen Amtsperioden erzeugen, welche von dort aus auch bearbeitet werden können.
   table(border= '1px')
         thead
             tr
@@ -99,6 +109,7 @@ block content
                 td bis
                 td bearbeiten
         tdbody
+        //Iteration über alle Amtsperioden
         each period,index in periods
             tr
                 form(action='/edit_period/'+period._id, method='post', name='edit_period'+index)
@@ -112,4 +123,5 @@ block content
                         a(href='#',onclick="edit_period"+index+".submit()")
                             span.glyphicon.glyphicon-edit
   hr
+  //Link zum Suchinterface
   a(href='/search') zum Suchinterface

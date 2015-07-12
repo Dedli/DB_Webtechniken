@@ -1,3 +1,5 @@
+// Grundlegende Includs und oft benutzte javascript Funktionen
+    Diese Datei wird vor jeder anderen jade Datei geladen
 doctype html
 html
   head
@@ -7,7 +9,7 @@ html
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js')
     link(rel='stylesheet', href='/stylesheets/style.css')
 
-
+    //Javascript Funktion zum validieren der Von: Bis: Einträge (Von darf nicht nach Bis: sein)
     script(type='text/javascript').
         {
             function validateTimeframe(obj){

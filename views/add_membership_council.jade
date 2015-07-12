@@ -1,6 +1,6 @@
 //
    Created by daniel on 08.07.2015
-
+// Hinzufügen einer Fachschaftsmitgliedschaft
 extends layout
 block content
     h2 Mitgliedschaft hinzuf&uuml;gen
@@ -17,7 +17,7 @@ block content
         label(for='council_id')
             b Fachschaft:&nbsp
                 select(name='council_id')
-                    <option value="" style="display:none;"></option>
+                    //Alle Fachschaften in select eintragen
                     each cou, index in councils
                         <option value="#{cou._id}">#{cou._name}</option>
         button(type="submit") Abschicken
