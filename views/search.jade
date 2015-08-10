@@ -4,7 +4,10 @@
 extends layout
 
 block content
-
+    h1 Suchinterface
+    if(admin)
+        a(href="/admin") zum Admininterface
+        hr
     form(action="/search",method="post")
         div
             label(for='firstname')
@@ -19,7 +22,7 @@ block content
                 b Amtsperiode:&nbsp
                     select(name='period')
                         <option value="">Bitte ausw&auml;hlen</option>
-                        //iteration über alle Amtsperioden
+                        //iteration ï¿½ber alle Amtsperioden
                         each per, i in periods
                                 <option value="#{per._id}">#{moment(per.from).format("DD.MM.YYYY")} - #{moment(per.to).format("DD.MM.YYYY")}</option>
         div
@@ -27,7 +30,7 @@ block content
                 b Gremium:&nbsp
                     select(name='committee')
                         <option value="">Bitte ausw&auml;hlen</option>
-                        //iteration über alle Gremien
+                        //iteration ï¿½ber alle Gremien
                         each comm in committees
                             <option value="#{comm._id}">#{comm._name}</option>
         div
@@ -35,7 +38,7 @@ block content
                 b Fachschaft:&nbsp
                     select(name='council')
                         <option value="">Bitte ausw&auml;hlen</option>
-                        //Iteration über alle Fachschaften
+                        //Iteration ï¿½ber alle Fachschaften
                         each cou in councils
                             <option value="#{cou._id}">#{cou._name}</option>
         div

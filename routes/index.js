@@ -5,7 +5,7 @@ var router = express.Router();
 var validator = require('validator');
 var moment = require('moment');
 
-// Einbinden der Models für MongoDB Zugriff
+// Einbinden der Models fï¿½r MongoDB Zugriff
 var grm_user_model = require('../models/grem_member');
 var membership_model = require('../models/membership');
 var committee_model = require('../models/committee');
@@ -13,7 +13,7 @@ var student_council_model = require('../models/student_council');
 var period_model = require('../models/period');
 var membership_council_model = require('../models/membership_council');
 
-//Sicherstellen, dass der Zugriff nur getätigt wird, wenn der Nutzer angemeldet ist
+//Sicherstellen, dass der Zugriff nur getï¿½tigt wird, wenn der Nutzer angemeldet ist
 var isAuthenticated = function (req, res, next) {
     // if user is authenticated in the session, call the next() to call the next request handler
     // Passport adds this method to request object. A middleware is allowed to add properties to
@@ -37,7 +37,7 @@ module.exports = function(passport){
         passport.authenticate('login', function(err,user){
             //falls Fehler -> Fehler weiterreichen
             if (err) { return next(err); }
-            // falls Login nicht möglich Weiterleitung zur Login Seite
+            // falls Login nicht mï¿½glich Weiterleitung zur Login Seite
             if (!user) { return res.redirect('/login'); }
             req.logIn(user, function(err) {
                 if (err) { return next(err); }
@@ -134,7 +134,7 @@ module.exports = function(passport){
                     member = user;
                 }
             });
-            // Mitgliedschaft in Fachschaften für den zuvor gefunden Nutzer aus der DB anfordern
+            // Mitgliedschaft in Fachschaften fï¿½r den zuvor gefunden Nutzer aus der DB anfordern
             membership_council_model.find({user_id: user_id}, function (err, data) {
                 //Error Handling
                 if (err) {
@@ -149,7 +149,7 @@ module.exports = function(passport){
                     council_membership = data;
                 }
             });
-            // Mitgliedschaft in Gremiuen für den zuvor gefundenen Nutzer aus der DB anfordern
+            // Mitgliedschaft in Gremiuen fï¿½r den zuvor gefundenen Nutzer aus der DB anfordern
             membership_model.find({user_id: user_id}, function (err, memberships) {
                 if (!memberships) res.status(404).send("Keine Gremnienmitgliedschaft");
                 else if (err) res.status(500).send(err.message);
@@ -237,14 +237,14 @@ module.exports = function(passport){
                     res.status(404).send("Nutzer nicht gefunden");
                 }
                 else {
-                    console.log("speicher geänderte Userdaten");
+                    console.log("speicher geï¿½nderte Userdaten");
                     console.log(user);
-                    //falls Daten geändert wurden, werden diese in usr geändert
+                    //falls Daten geï¿½ndert wurden, werden diese in usr geï¿½ndert
                     usr.firstname = user.firstname || usr.firstname;
                     usr.lastname = user.lastname || usr.lastname;
                     usr.nkz = user.nkz || usr.nkz;
                     usr.matr_nr = user.matr_nr || usr.matr_nr;
-                    //schreiben der Änderungen in die DB
+                    //schreiben der ï¿½nderungen in die DB
                     usr.save(function (err) {
                         if (err) {
                             console.error(err.message);
@@ -289,7 +289,7 @@ module.exports = function(passport){
                                 council.to = cou.to || council.to;
                                 council.user_id = cou.user_id || council.user_id;
                                 console.log("Save council Membership: " + council);
-                                //speichern der geänderten Fachschaftsmitgliedschaft
+                                //speichern der geï¿½nderten Fachschaftsmitgliedschaft
                                 council.save(function (err) {
                                     if (err) {
                                         console.error(err.message);
@@ -333,7 +333,7 @@ module.exports = function(passport){
                                                             res.status(400).send("no valid committee timeframe");
                                                         }
 
-                                                        //Gremiummitgliedschaft durch geänderte Werte ergänzen
+                                                        //Gremiummitgliedschaft durch geï¿½nderte Werte ergï¿½nzen
                                                         comm.grem_id = membership.committee || comm.grem_id;
                                                         comm.from = membership.from || comm.from;
                                                         comm.to = membership.to || comm.to;
@@ -404,7 +404,7 @@ module.exports = function(passport){
                             }
                             else if (!cou) res.status(404).send('Committee not found');
                             else{
-                                //Rendern der add_membership.jade mit allen Gremien, Amtszeiten, Fachschaften und der User_id, zusätzlich noch das Modul moment zur Datumskonvertierung
+                                //Rendern der add_membership.jade mit allen Gremien, Amtszeiten, Fachschaften und der User_id, zusï¿½tzlich noch das Modul moment zur Datumskonvertierung
                                 res.render('add_membership',{committees: committees,periods: per,councils:cou,user_id: user_id,moment: moment})
                     }
                 })
@@ -413,7 +413,7 @@ module.exports = function(passport){
         }
         })
     });
-    //Handle des Posts zum Hinzufügen einer Gremienmitgliedschaft
+    //Handle des Posts zum Hinzufï¿½gen einer Gremienmitgliedschaft
     router.post('/add_membership/:user_id',isAuthenticated, function(req,res){
         if(!req.user.admin) {res.redirect('/');}
         else {
@@ -446,7 +446,7 @@ module.exports = function(passport){
         }
     });
 
-    //Handle GET Request für Faschaftsmitgliedschaft
+    //Handle GET Request fï¿½r Faschaftsmitgliedschaft
     router.get('/add_membership_council/:user_id',isAuthenticated, function(req,res){
         //Abspeichern der user_id aus der URL
         var user_id = req.params.user_id;
@@ -461,12 +461,12 @@ module.exports = function(passport){
                             }
                             else if (!cou) res.status(404).send('Committee not found');
                             else{
-                                //Rendern der add_membership_council.jade mit allen Fachschaften der user_id und dem Modul moment für die Datumskonvertierung
+                                //Rendern der add_membership_council.jade mit allen Fachschaften der user_id und dem Modul moment fï¿½r die Datumskonvertierung
                                 res.render('add_membership_council',{councils:cou,user_id: user_id,moment: moment})
                             }
                         })
     });
-//Handle des POSTs zum Hinzufügen einer Fachschaftsmitgliedschaft für einen User
+//Handle des POSTs zum Hinzufï¿½gen einer Fachschaftsmitgliedschaft fï¿½r einen User
     router.post('/add_membership_council/:user_id',isAuthenticated, function(req,res){
         if(!req.user.admin) {res.redirect('/');}
         else {
@@ -489,7 +489,7 @@ module.exports = function(passport){
                     })
                 }
                 else
-                //Form-Post-Redirect bei erfolgreichem Hinzufügen der Fachschaftsmitgliedschaft mit vorheriger Ausgabe einer Erfolgsmeldung
+                //Form-Post-Redirect bei erfolgreichem Hinzufï¿½gen der Fachschaftsmitgliedschaft mit vorheriger Ausgabe einer Erfolgsmeldung
                     res.render('success', {msg: "Mitgliedschaft erfolgreich hinzugef\u00fcgt"});
             });
         }
@@ -542,7 +542,7 @@ module.exports = function(passport){
               console.log('\nsave membership: ');
               console.log(membership);
           });
-          //Iteration über alle Fachschaftsmitgliedschaften
+          //Iteration ï¿½ber alle Fachschaftsmitgliedschaften
           req.body.councils.forEach(function (council) {
               //console.log("ID beim Post: "+user._id);
                 //Anlegen einer neuen Fachschaftsmitgliedschaft
@@ -592,7 +592,7 @@ module.exports = function(passport){
 
 //Handle GET auf /create_committee
     router.get('/create_committee',isAuthenticated, function(req, res){
-        //Rendern der create_committee.jade nach vorheriger Authentizitätsprüfung
+        //Rendern der create_committee.jade nach vorheriger Authentizitï¿½tsprï¿½fung
         if(!req.user.admin) {res.redirect('/');}
         else {
             res.render('create_committee');
@@ -641,10 +641,10 @@ module.exports = function(passport){
                 }
                 else if (!comm) res.status(404).send("Gremium nicht gefunden");
                 else {
-                    //Geänderte Werte in das gefundene Gremium schreiben
+                    //Geï¿½nderte Werte in das gefundene Gremium schreiben
                     comm._name = committee._name || comm._name;
                     comm.description = committee.description || comm.description;
-                    //Abspeichern der Änderungen
+                    //Abspeichern der ï¿½nderungen
                     comm.save(function (err) {
                         if (err) {
                             res.status(err.status || 500);
@@ -663,7 +663,7 @@ module.exports = function(passport){
 
     //Handle create_student_council GET Request
     router.get('/create_student_council',isAuthenticated, function(req, res){
-        //Autorisierung prüfen
+        //Autorisierung prï¿½fen
         if(!req.user.admin) {res.redirect('/');}
         else {
             //Rendern der create_student_council.jade
@@ -706,7 +706,7 @@ module.exports = function(passport){
             var council = req.body;
             var council_id = req.params._id;
             console.log("From Edit Council: " + council_id);
-            //Die zu ändernde Fachschaft aus der DB holen
+            //Die zu ï¿½ndernde Fachschaft aus der DB holen
             student_council_model.findById(council_id, function (err, cou) {
                 if (err) {
                     res.status(err.status || 500);
@@ -717,9 +717,9 @@ module.exports = function(passport){
                 }
                 else if (!cou) res.status(404).send("Fachschaft nicht gefunden");
                 else {
-                    //Ändern des Namens der Fachschaft
+                    //ï¿½ndern des Namens der Fachschaft
                     cou._name = council._name || cou._name;
-                    //Schreiben der Änderungen in die DB
+                    //Schreiben der ï¿½nderungen in die DB
                     cou.save(function (err) {
                         if (err) {
                             res.status(err.status || 500);
@@ -771,7 +771,7 @@ module.exports = function(passport){
         }
     });
 
-    //Handle POST Request zum ändern einer Amtszeit
+    //Handle POST Request zum ï¿½ndern einer Amtszeit
     router.post('/edit_period/:_id',isAuthenticated, function(req, res) {
         //Autorisierung
         if(!req.user.admin) {res.redirect('/');}
@@ -779,7 +779,7 @@ module.exports = function(passport){
             var period = req.body;
             var period_id = req.params._id;
             console.log("From Edit Period: " + period_id);
-            //Finden der zu ändernden Amtszeit aus der DB
+            //Finden der zu ï¿½ndernden Amtszeit aus der DB
             period_model.findById(period_id, function (err, per) {
                 if (err) {
                     res.status(err.status || 500);
@@ -790,7 +790,7 @@ module.exports = function(passport){
                 }
                 else if (!per) res.status(404).send("Amtszeit nicht gefunden");
                 else {
-                    //Ändern der Werte
+                    //ï¿½ndern der Werte
                     per.from = period.from || per.from;
                     per.to = period.to || per.to;
                     //Speichern der Amtszeit
@@ -865,7 +865,7 @@ module.exports = function(passport){
                                           else if (!periods) res.status(404).send('Fehler beim DB Zugriff');
                                           else {
 
-                    //Rendern von admin.jade mit allen Usern, dem akutellem User, allen Gremien, allen Fachschaften, allen Amtszeiten und dem Modul moment für die Datumskonvertierung
+                    //Rendern von admin.jade mit allen Usern, dem akutellem User, allen Gremien, allen Fachschaften, allen Amtszeiten und dem Modul moment fï¿½r die Datumskonvertierung
                       res.render('admin', {
                           grm_members: grm_users,
                           user: req.user,
@@ -938,7 +938,7 @@ module.exports = function(passport){
                             }
                             else {
                         //Rendern des Suchinterfaces mit allen Amtszeiten, Gremien und Fachschaften, sowie dem Modul moment zur Datumskonvertierung
-                        res.render('search', {periods: periods, moment: moment, committees: committees, councils: councils});
+                        res.render('search', {periods: periods, moment: moment, committees: committees, councils: councils, admin: req.user.admin});
                     }
 
                     });
@@ -949,7 +949,7 @@ module.exports = function(passport){
             });
         });
 
-    //Handle des Post Request für die Suchanfrage
+    //Handle des Post Request fï¿½r die Suchanfrage
     router.post('/search',isAuthenticated, function(req, res) {
         console.log("Search Result: ");console.log(req.body);
         var query = {};
@@ -975,10 +975,11 @@ module.exports = function(passport){
             }
             else {
                 query = {};
-                //Suchquery für die Usersuche erstellen
+                //Suchquery fï¿½r die Usersuche erstellen
                 if(!validator.isNull(req.body.firstname)) query.firstname = req.body.firstname;
                 if(!validator.isNull(req.body.lastname)) query.lastname = req.body.lastname;
-                //Finden der User, welche den Suchquery erfüllen
+                //Finden der User, welche den Suchquery erfï¿½llen
+                console.log("sucherQuery User: ");console.log(query);
                 grm_user_model.find(query,function(err,users){
                     if (err) {
                         res.status(err.status || 500);
